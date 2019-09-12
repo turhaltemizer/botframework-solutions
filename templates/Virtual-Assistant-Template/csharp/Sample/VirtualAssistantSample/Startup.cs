@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.ApplicationInsights;
@@ -20,6 +21,7 @@ using Microsoft.Bot.Builder.Skills.Models.Manifest;
 using Microsoft.Bot.Builder.Solutions.Authentication;
 using Microsoft.Bot.Builder.StreamingExtensions;
 using Microsoft.Bot.Connector.Authentication;
+using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -75,6 +77,8 @@ namespace VirtualAssistantSample
 
             // Configure bot services
             services.AddSingleton<BotServices>();
+
+            services.AddSingleton<ConcurrentDictionary<string, ConversationReference>>();
 
             // Configure storage
             // Uncomment the following line for local development without Cosmos Db

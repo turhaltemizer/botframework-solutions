@@ -43,17 +43,16 @@ namespace VirtualAssistantSample.Dialogs
         {
             _state = await _accessor.GetAsync(sc.Context, () => new OnboardingState());
 
+            // always multi-turn
             if (!string.IsNullOrEmpty(_state.Name))
             {
-                return await sc.NextAsync(_state.Name);
+                await sc.Context.SendActivityAsync($"Your name is {_state.Name}");
             }
-            else
+
+            return await sc.PromptAsync(DialogIds.NamePrompt, new PromptOptions()
             {
-                return await sc.PromptAsync(DialogIds.NamePrompt, new PromptOptions()
-                {
-                    Prompt = await _responder.RenderTemplate(sc.Context, sc.Context.Activity.Locale, OnboardingResponses.ResponseIds.NamePrompt),
-                });
-            }
+                Prompt = await _responder.RenderTemplate(sc.Context, sc.Context.Activity.Locale, OnboardingResponses.ResponseIds.NamePrompt),
+            });
         }
 
         public async Task<DialogTurnResult> FinishOnboardingDialog(WaterfallStepContext sc, CancellationToken cancellationToken)

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using System.Collections.Concurrent;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Azure;
 using Microsoft.Bot.Builder.Integration.AspNet.Core;
@@ -8,6 +9,7 @@ using Microsoft.Bot.Builder.Solutions.Feedback;
 using Microsoft.Bot.Builder.Solutions.Middleware;
 using Microsoft.Bot.Connector.Authentication;
 using Microsoft.Bot.Schema;
+using VirtualAssistantSample.Middlewares;
 using VirtualAssistantSample.Responses.Main;
 using VirtualAssistantSample.Services;
 
@@ -18,6 +20,7 @@ namespace VirtualAssistantSample.Adapters
         public DefaultAdapter(
             BotSettings settings,
             ConversationState conversationState,
+            ConcurrentDictionary<string, ConversationReference> conversationReferences,
             ICredentialProvider credentialProvider,
             IBotTelemetryClient telemetryClient)
             : base(credentialProvider)
@@ -38,6 +41,7 @@ namespace VirtualAssistantSample.Adapters
             Use(new FeedbackMiddleware(conversationState, telemetryClient));
             Use(new SetLocaleMiddleware(settings.DefaultLocale ?? "en-us"));
             Use(new EventDebuggerMiddleware());
+            Use(new ProactiveMiddleware(conversationReferences));
         }
     }
 }
