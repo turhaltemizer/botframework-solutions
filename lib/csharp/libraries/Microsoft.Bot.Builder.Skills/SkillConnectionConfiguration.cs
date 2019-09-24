@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-using Microsoft.Bot.Builder.Skills.Auth;
+using Microsoft.Bot.Connector.Authentication;
 
 namespace Microsoft.Bot.Builder.Skills
 {
@@ -9,6 +9,6 @@ namespace Microsoft.Bot.Builder.Skills
     {
         public SkillOptions SkillOptions { get; set; }
 
-        public IServiceClientCredentials ServiceClientCredentials { get; set; }
+        public MicrosoftAppCredentials ServiceClientCredentials { get; set; }
     }
 }

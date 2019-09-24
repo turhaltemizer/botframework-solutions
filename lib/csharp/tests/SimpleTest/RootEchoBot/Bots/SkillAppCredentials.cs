@@ -1,12 +1,11 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-using Microsoft.Bot.Builder.Skills.Auth;
 using Microsoft.Bot.Connector.Authentication;
 
 namespace RootEchoBot.Bots
 {
-    public class SkillAppCredentials : MicrosoftAppCredentials, IServiceClientCredentials
+    public class SkillAppCredentials : MicrosoftAppCredentials
     {
         public SkillAppCredentials(string appId, string password, string oauthScope)
             : base(appId, password)

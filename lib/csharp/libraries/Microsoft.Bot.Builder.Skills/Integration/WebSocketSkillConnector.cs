@@ -8,7 +8,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Bot.Builder.Skills.Auth;
+using Microsoft.Bot.Connector.Authentication;
 using Microsoft.Bot.Schema;
 using Microsoft.Bot.StreamingExtensions;
 using Microsoft.Bot.StreamingExtensions.Transport;
@@ -27,11 +27,11 @@ namespace Microsoft.Bot.Builder.Skills.Integration
     public class WebSocketSkillConnector : SkillConnector
     {
         private readonly IBotTelemetryClient _botTelemetryClient;
-        private readonly IServiceClientCredentials _serviceClientCredentials;
+        private readonly MicrosoftAppCredentials _serviceClientCredentials;
         private readonly SkillOptions _skillOptions;
         private IStreamingTransportClient _streamingTransportClient;
 
-        public WebSocketSkillConnector(IBotTelemetryClient botTelemetryClient, SkillOptions skillOptions, IServiceClientCredentials serviceClientCredentials, IStreamingTransportClient streamingTransportClient = null)
+        public WebSocketSkillConnector(IBotTelemetryClient botTelemetryClient, SkillOptions skillOptions, MicrosoftAppCredentials serviceClientCredentials, IStreamingTransportClient streamingTransportClient = null)
         {
             _botTelemetryClient = botTelemetryClient;
             _skillOptions = skillOptions;
@@ -39,7 +39,7 @@ namespace Microsoft.Bot.Builder.Skills.Integration
             _streamingTransportClient = streamingTransportClient;
         }
 
-        public override async Task<Activity> ForwardActivityAsync(ITurnContext turnContext, Activity activity, CancellationToken cancellationToken)
+        public override async Task<Activity> ForwardActivityAsync(ITurnContext turnContext, Activity activity, CancellationToken cancellationToken = default)
         {
             var responseHandler = new SkillWebSocketsResponseHandler(turnContext, _botTelemetryClient);
             try

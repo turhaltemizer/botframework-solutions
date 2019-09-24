@@ -23,6 +23,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="ToBeDeleted\IActivityHandler.cs" />
+    <Compile Remove="ToBeDeleted\IServiceClientCredentials.cs" />
+    <Compile Remove="ToBeDeleted\MicrosoftAppCredentialsEx.cs" />
     <Compile Remove="ToBeDeleted\SkillWebSocketAdapter.cs" />
     <Compile Remove="ToBeDeleted\SkillWebSocketCallbackException.cs" />
     <Compile Remove="ToBeDeleted\SkillWebSocketRequestHandler.cs" />
