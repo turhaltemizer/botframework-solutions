@@ -5,7 +5,6 @@ using System;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Bot.Builder.Skills.Protocol;
 using Microsoft.Bot.Schema;
 using Microsoft.Bot.StreamingExtensions;
 using Microsoft.Extensions.Logging;
@@ -33,21 +32,21 @@ namespace Microsoft.Bot.Builder.Skills.Integration
                     Method = "POST",
                     Path = "/activities/{activityId}",
                     ActionAsync = async (request, routeData, cancellationToken) =>
+                    {
+                        var activity = request.ReadBodyAsJson<Activity>();
+                        if (activity != null)
                         {
-                            var activity = request.ReadBodyAsJson<Activity>();
-                            if (activity != null)
+                            // Store the end of conversation activity.
+                            if (activity.Type == ActivityTypes.EndOfConversation)
                             {
-                                // Store the end of conversation activity.
-                                if (activity.Type == ActivityTypes.EndOfConversation)
-                                {
-                                    _endOfConversationActivity = activity;
-                                }
-
-                                return await OnSendActivityAsync(turnContext, activity, cancellationToken).ConfigureAwait(false);
+                                _endOfConversationActivity = activity;
                             }
 
-                            throw new Exception("Error deserializing activity response!");
-                        },
+                            return await OnSendActivityAsync(turnContext, activity, cancellationToken).ConfigureAwait(false);
+                        }
+
+                        throw new Exception("Error deserializing activity response!");
+                    },
                 },
                 new RouteTemplate
                 {

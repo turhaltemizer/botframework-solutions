@@ -18,20 +18,20 @@ using Newtonsoft.Json;
 namespace Microsoft.Bot.Builder.Skills.Integration
 {
     /// <summary>
-    /// WebSocketSkillConnector that inherits from the base SkillConnector.
+    /// SkillWebSocketsConnector that inherits from the base SkillConnector.
     /// </summary>
     /// <remarks>
     /// Its responsibility is to forward a incoming request to the skill and handle
     /// the responses based on Skill Protocol.
     /// </remarks>
-    public class WebSocketSkillConnector : SkillConnector
+    public class SkillWebSocketsConnector : SkillConnector
     {
         private readonly IBotTelemetryClient _botTelemetryClient;
         private readonly MicrosoftAppCredentials _serviceClientCredentials;
         private readonly SkillOptions _skillOptions;
         private IStreamingTransportClient _streamingTransportClient;
 
-        public WebSocketSkillConnector(IBotTelemetryClient botTelemetryClient, SkillOptions skillOptions, MicrosoftAppCredentials serviceClientCredentials, IStreamingTransportClient streamingTransportClient = null)
+        public SkillWebSocketsConnector(IBotTelemetryClient botTelemetryClient, SkillOptions skillOptions, MicrosoftAppCredentials serviceClientCredentials, IStreamingTransportClient streamingTransportClient = null)
         {
             _botTelemetryClient = botTelemetryClient;
             _skillOptions = skillOptions;

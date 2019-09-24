@@ -5,11 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Bot.StreamingExtensions;
 
-namespace Microsoft.Bot.Builder.Skills.Protocol
+namespace Microsoft.Bot.Builder.Skills.Integration
 {
     internal class Router
     {
