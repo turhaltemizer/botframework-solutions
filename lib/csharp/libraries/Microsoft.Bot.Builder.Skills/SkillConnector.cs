@@ -16,8 +16,6 @@ namespace Microsoft.Bot.Builder.Skills
     /// </remarks>
     public abstract class SkillConnector
     {
-        // TODO: add delegate for interception.
-
         /// <summary>
         /// Forward incoming request to the skill.
         /// </summary>
@@ -25,7 +23,17 @@ namespace Microsoft.Bot.Builder.Skills
         /// <param name="activity">Activity object to forward.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>Response activity of the forwarded activity to the skill.</returns>
-        public abstract Task<Activity> ForwardActivityAsync(ITurnContext context, Activity activity, CancellationToken cancellationToken = default);
+        public abstract Task<Activity> ForwardActivityAsync(ITurnContext context, Activity activity, CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Forward incoming request to the skill.
+        /// </summary>
+        /// <param name="context">The <see cref="TurnContext"/> for the activity.</param>
+        /// <param name="activity">Activity object to forward.</param>
+        /// <param name="activitiesHandler">A handler to process incoming activities.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns>Response activity of the forwarded activity to the skill.</returns>
+        public abstract Task<Activity> ForwardActivityAsync(ITurnContext context, Activity activity, SendActivitiesHandler activitiesHandler, CancellationToken cancellationToken);
 
         /// <summary>
         /// Cancel the remote skill dialogs on the stack.
@@ -33,6 +41,6 @@ namespace Microsoft.Bot.Builder.Skills
         /// <param name="turnContext">The turn context instance.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>Task.</returns>
-        public abstract Task CancelRemoteDialogsAsync(ITurnContext turnContext, CancellationToken cancellationToken = default);
+        public abstract Task CancelRemoteDialogsAsync(ITurnContext turnContext, CancellationToken cancellationToken);
     }
 }

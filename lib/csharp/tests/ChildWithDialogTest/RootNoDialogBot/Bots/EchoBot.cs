@@ -30,7 +30,8 @@ namespace RootNoDialogBot.Bots
 
         protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
         {
-            var ret = await _skillConnector.ForwardActivityAsync(turnContext, turnContext.Activity as Activity, cancellationToken);
+            // var ret = await _skillConnector.ForwardActivityAsync(turnContext, turnContext.Activity as Activity, InterceptHandler, cancellationToken);
+            var ret = await _skillConnector.ForwardActivityAsync(turnContext, turnContext.Activity as Activity, InterceptHandler, cancellationToken);
             if (ret != null && ret.Type == ActivityTypes.EndOfConversation)
             {
                 await turnContext.SendActivityAsync(MessageFactory.Text("The skill has ended"), cancellationToken);
@@ -46,6 +47,17 @@ namespace RootNoDialogBot.Bots
                     await turnContext.SendActivityAsync(MessageFactory.Text("Hello and welcome!"), cancellationToken);
                 }
             }
+        }
+
+        private async Task<ResourceResponse[]> InterceptHandler(ITurnContext turnContext, List<Activity> activities, Func<Task<ResourceResponse[]>> next)
+        {
+            foreach (var activity in activities)
+            {
+                //await turnContext.SendActivityAsync($"Intercept {activity.Type} {activity.Text}");
+                activity.Text += " XOXO";
+            }
+
+            return await next().ConfigureAwait(false);
         }
     }
 }

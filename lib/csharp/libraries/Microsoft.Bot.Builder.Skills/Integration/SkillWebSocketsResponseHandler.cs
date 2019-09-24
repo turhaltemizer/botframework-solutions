@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,7 +22,7 @@ namespace Microsoft.Bot.Builder.Skills.Integration
         private readonly Router _router;
         private Activity _endOfConversationActivity;
 
-        public SkillWebSocketsResponseHandler(ITurnContext turnContext, IBotTelemetryClient botTelemetryClient)
+        public SkillWebSocketsResponseHandler(ITurnContext turnContext, SendActivitiesHandler activitiesHandler, IBotTelemetryClient botTelemetryClient)
         {
             _botTelemetryClient = botTelemetryClient;
 
@@ -42,7 +43,7 @@ namespace Microsoft.Bot.Builder.Skills.Integration
                                 _endOfConversationActivity = activity;
                             }
 
-                            return await OnSendActivityAsync(turnContext, activity, cancellationToken).ConfigureAwait(false);
+                            return await OnSendActivityAsync(turnContext, activity, activitiesHandler, cancellationToken).ConfigureAwait(false);
                         }
 
                         throw new Exception("Error deserializing activity response!");
@@ -55,7 +56,7 @@ namespace Microsoft.Bot.Builder.Skills.Integration
                     ActionAsync = async (request, routeData, cancellationToken) =>
                     {
                         var activity = request.ReadBodyAsJson<Activity>();
-                        return await OnUpdateActivityAsync(turnContext, activity, cancellationToken).ConfigureAwait(false);
+                        return await OnUpdateActivityAsync(turnContext, activity, activitiesHandler, cancellationToken).ConfigureAwait(false);
                     },
                 },
                 new RouteTemplate
@@ -64,7 +65,7 @@ namespace Microsoft.Bot.Builder.Skills.Integration
                     Path = "/activities/{activityId}",
                     ActionAsync = async (request, routeData, cancellationToken) =>
                     {
-                        return await OnDeleteActivityAsync(turnContext, routeData.activityId, cancellationToken);
+                        return await OnDeleteActivityAsync(turnContext, routeData.activityId, activitiesHandler, cancellationToken);
                     },
                 },
             };
@@ -101,19 +102,28 @@ namespace Microsoft.Bot.Builder.Skills.Integration
             }
         }
 
-        public async Task<ResourceResponse> OnSendActivityAsync(ITurnContext context, Activity activity, CancellationToken cancellationToken)
+        public async Task<ResourceResponse> OnSendActivityAsync(ITurnContext context, Activity activity, SendActivitiesHandler activitiesHandler, CancellationToken cancellationToken)
         {
-            await context.SendActivityAsync(activity, cancellationToken).ConfigureAwait(false);
-            return new ResourceResponse(activity.Id);
+            if (activitiesHandler != null)
+            {
+                var r = await activitiesHandler.Invoke(context, new List<Activity> { activity }, async () =>
+                {
+                    var response = await context.SendActivityAsync(activity, cancellationToken).ConfigureAwait(false);
+                    var rr = new ResourceResponse[1] { response };
+                    return rr;
+                }).ConfigureAwait(false);
+                return r[0];
+            }
+
+            return await context.SendActivityAsync(activity, cancellationToken).ConfigureAwait(false);
         }
 
-        public async Task<ResourceResponse> OnUpdateActivityAsync(ITurnContext context, Activity activity, CancellationToken cancellationToken)
+        public async Task<ResourceResponse> OnUpdateActivityAsync(ITurnContext context, Activity activity, SendActivitiesHandler activitiesHandler, CancellationToken cancellationToken)
         {
-            await context.UpdateActivityAsync(activity, cancellationToken).ConfigureAwait(false);
-            return new ResourceResponse(activity.Id);
+            return await context.UpdateActivityAsync(activity, cancellationToken).ConfigureAwait(false);
         }
 
-        public async Task OnDeleteActivityAsync(ITurnContext context, string activityId, CancellationToken cancellationToken)
+        public async Task OnDeleteActivityAsync(ITurnContext context, string activityId, SendActivitiesHandler activitiesHandler, CancellationToken cancellationToken)
         {
             await context.DeleteActivityAsync(activityId, cancellationToken).ConfigureAwait(false);
         }

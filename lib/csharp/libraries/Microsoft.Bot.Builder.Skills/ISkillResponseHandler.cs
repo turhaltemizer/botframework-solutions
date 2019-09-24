@@ -9,11 +9,11 @@ namespace Microsoft.Bot.Builder.Skills
 {
     public interface ISkillResponseHandler
     {
-        Task<ResourceResponse> OnSendActivityAsync(ITurnContext context, Activity activity, CancellationToken cancellationToken);
+        Task<ResourceResponse> OnSendActivityAsync(ITurnContext context, Activity activity, SendActivitiesHandler activitiesHandler, CancellationToken cancellationToken);
 
-        Task<ResourceResponse> OnUpdateActivityAsync(ITurnContext context, Activity activity, CancellationToken cancellationToken);
+        Task<ResourceResponse> OnUpdateActivityAsync(ITurnContext context, Activity activity, SendActivitiesHandler activitiesHandler, CancellationToken cancellationToken);
 
-        Task OnDeleteActivityAsync(ITurnContext context, string activityId, CancellationToken cancellationToken);
+        Task OnDeleteActivityAsync(ITurnContext context, string activityId, SendActivitiesHandler activitiesHandler, CancellationToken cancellationToken);
 
         Activity GetEndOfConversationActivity();
     }
