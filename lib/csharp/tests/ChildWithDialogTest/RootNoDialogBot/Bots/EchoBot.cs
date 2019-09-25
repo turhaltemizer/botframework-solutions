@@ -53,10 +53,10 @@ namespace RootNoDialogBot.Bots
         {
             foreach (var activity in activities)
             {
-                //await turnContext.SendActivityAsync($"Intercept {activity.Type} {activity.Text}");
-                activity.Text += " XOXO";
+                await turnContext.SendActivityAsync($"Intercept {activity.Type} {activity.Text}");
             }
 
+            // We can return null if we don't want the activity to continue
             return await next().ConfigureAwait(false);
         }
     }

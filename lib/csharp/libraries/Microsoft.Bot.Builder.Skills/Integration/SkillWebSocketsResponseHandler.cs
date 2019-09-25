@@ -43,7 +43,7 @@ namespace Microsoft.Bot.Builder.Skills.Integration
                                 _endOfConversationActivity = activity;
                             }
 
-                            return await OnSendActivityAsync(turnContext, activity, activitiesHandler, cancellationToken).ConfigureAwait(false);
+                            return await OnSendActivitiesAsync(turnContext, new List<Activity> { activity }, activitiesHandler, cancellationToken).ConfigureAwait(false);
                         }
 
                         throw new Exception("Error deserializing activity response!");
@@ -102,20 +102,23 @@ namespace Microsoft.Bot.Builder.Skills.Integration
             }
         }
 
-        public async Task<ResourceResponse> OnSendActivityAsync(ITurnContext context, Activity activity, SendActivitiesHandler activitiesHandler, CancellationToken cancellationToken)
+        public async Task<ResourceResponse[]> OnSendActivitiesAsync(ITurnContext context, List<Activity> activities, SendActivitiesHandler activitiesHandler, CancellationToken cancellationToken)
         {
-            if (activitiesHandler != null)
+            var activityArray = new IActivity[activities.Count];
+            for (var i = 0; i < activities.Count; i++)
             {
-                var r = await activitiesHandler.Invoke(context, new List<Activity> { activity }, async () =>
-                {
-                    var response = await context.SendActivityAsync(activity, cancellationToken).ConfigureAwait(false);
-                    var rr = new ResourceResponse[1] { response };
-                    return rr;
-                }).ConfigureAwait(false);
-                return r[0];
+                activityArray[i] = activities[i];
             }
 
-            return await context.SendActivityAsync(activity, cancellationToken).ConfigureAwait(false);
+            if (activitiesHandler != null)
+            {
+                return await activitiesHandler.Invoke(context, activities, async () =>
+                {
+                    return await context.SendActivitiesAsync(activityArray, cancellationToken).ConfigureAwait(false);
+                }).ConfigureAwait(false);
+            }
+
+            return await context.SendActivitiesAsync(activityArray, cancellationToken).ConfigureAwait(false);
         }
 
         public async Task<ResourceResponse> OnUpdateActivityAsync(ITurnContext context, Activity activity, SendActivitiesHandler activitiesHandler, CancellationToken cancellationToken)
