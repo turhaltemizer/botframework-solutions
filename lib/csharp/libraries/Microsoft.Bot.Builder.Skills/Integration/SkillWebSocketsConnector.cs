@@ -31,7 +31,7 @@ namespace Microsoft.Bot.Builder.Skills.Integration
         private readonly SkillOptions _skillOptions;
         private IStreamingTransportClient _streamingTransportClient;
 
-        public SkillWebSocketsConnector(IBotTelemetryClient botTelemetryClient, SkillOptions skillOptions, MicrosoftAppCredentials serviceClientCredentials, IStreamingTransportClient streamingTransportClient = null)
+        public SkillWebSocketsConnector(SkillOptions skillOptions, MicrosoftAppCredentials serviceClientCredentials, IBotTelemetryClient botTelemetryClient, IStreamingTransportClient streamingTransportClient = null)
         {
             _botTelemetryClient = botTelemetryClient;
             _skillOptions = skillOptions;

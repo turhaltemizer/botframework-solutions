@@ -25,7 +25,7 @@ namespace RootNoDialogBot.Bots
                 Endpoint = new Uri(configuration["SkillAppEndpoint"]),
             };
             var serviceClientCredentials = new SkillAppCredentials(configuration["SkillAppId"], configuration["SkillAppPassword"], "https://api.botframework.com");
-            _skillConnector = new SkillWebSocketsConnector(new NullBotTelemetryClient(), skillOptions, serviceClientCredentials);
+            _skillConnector = new SkillWebSocketsConnector(skillOptions, serviceClientCredentials, new NullBotTelemetryClient());
         }
 
         protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
@@ -49,7 +49,7 @@ namespace RootNoDialogBot.Bots
             }
         }
 
-        private async Task<ResourceResponse[]> InterceptHandler(ITurnContext turnContext, List<Activity> activities, Func<Task<ResourceResponse[]>> next)
+        private static async Task<ResourceResponse[]> InterceptHandler(ITurnContext turnContext, List<Activity> activities, Func<Task<ResourceResponse[]>> next)
         {
             foreach (var activity in activities)
             {

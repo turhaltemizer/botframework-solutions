@@ -47,7 +47,7 @@ namespace Microsoft.Bot.Builder.Solutions.Skills
                 Name = skillConnectionConfiguration.SkillOptions.Name,
                 Endpoint = skillConnectionConfiguration.SkillOptions.Endpoint,
             };
-            _skillConnector = new SkillWebSocketsConnector(telemetryClient, skillConnectionConfiguration.SkillOptions, skillConnectionConfiguration.ServiceClientCredentials);
+            _skillConnector = new SkillWebSocketsConnector(skillConnectionConfiguration.SkillOptions, skillConnectionConfiguration.ServiceClientCredentials, telemetryClient);
         }
 
         public async Task HandleTokenRequest(DialogContext dialogContext, Activity activity)
