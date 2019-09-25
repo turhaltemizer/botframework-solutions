@@ -102,7 +102,7 @@ namespace Microsoft.Bot.Builder.Skills.Integration
             }
         }
 
-        public async Task<ResourceResponse[]> OnSendActivitiesAsync(ITurnContext context, List<Activity> activities, SendActivitiesHandler activitiesHandler, CancellationToken cancellationToken)
+        public async Task<ResourceResponse[]> OnSendActivitiesAsync(ITurnContext turnContext, List<Activity> activities, SendActivitiesHandler activitiesHandler, CancellationToken cancellationToken)
         {
             var activityArray = new IActivity[activities.Count];
             for (var i = 0; i < activities.Count; i++)
@@ -112,18 +112,18 @@ namespace Microsoft.Bot.Builder.Skills.Integration
 
             if (activitiesHandler != null)
             {
-                return await activitiesHandler.Invoke(context, activities, async () =>
+                return await activitiesHandler.Invoke(turnContext, activities, async () =>
                 {
-                    return await context.SendActivitiesAsync(activityArray, cancellationToken).ConfigureAwait(false);
+                    return await turnContext.SendActivitiesAsync(activityArray, cancellationToken).ConfigureAwait(false);
                 }).ConfigureAwait(false);
             }
 
-            return await context.SendActivitiesAsync(activityArray, cancellationToken).ConfigureAwait(false);
+            return await turnContext.SendActivitiesAsync(activityArray, cancellationToken).ConfigureAwait(false);
         }
 
-        public async Task<ResourceResponse> OnUpdateActivityAsync(ITurnContext context, Activity activity, SendActivitiesHandler activitiesHandler, CancellationToken cancellationToken)
+        public async Task<ResourceResponse> OnUpdateActivityAsync(ITurnContext turnContext, Activity activity, SendActivitiesHandler activitiesHandler, CancellationToken cancellationToken)
         {
-            return await context.UpdateActivityAsync(activity, cancellationToken).ConfigureAwait(false);
+            return await turnContext.UpdateActivityAsync(activity, cancellationToken).ConfigureAwait(false);
         }
 
         public async Task OnDeleteActivityAsync(ITurnContext context, string activityId, SendActivitiesHandler activitiesHandler, CancellationToken cancellationToken)

@@ -39,14 +39,14 @@ namespace Microsoft.Bot.Builder.Skills.Integration
             _streamingTransportClient = streamingTransportClient;
         }
 
-        public override async Task<Activity> ForwardActivityAsync(ITurnContext context, Activity activity, CancellationToken cancellationToken)
+        public override async Task<Activity> ForwardActivityAsync(ITurnContext turnContext, Activity activity, CancellationToken cancellationToken)
         {
-            return await ForwardActivityAsync(context, activity, null, cancellationToken).ConfigureAwait(false);
+            return await ForwardActivityAsync(turnContext, activity, null, cancellationToken).ConfigureAwait(false);
         }
 
-        public override async Task<Activity> ForwardActivityAsync(ITurnContext context, Activity activity, SendActivitiesHandler activitiesHandler, CancellationToken cancellationToken)
+        public override async Task<Activity> ForwardActivityAsync(ITurnContext turnContext, Activity activity, SendActivitiesHandler activitiesHandler, CancellationToken cancellationToken)
         {
-            var responseHandler = new SkillWebSocketsResponseHandler(context, activitiesHandler, _botTelemetryClient);
+            var responseHandler = new SkillWebSocketsResponseHandler(turnContext, activitiesHandler, _botTelemetryClient);
             try
             {
                 if (_streamingTransportClient == null)
