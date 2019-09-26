@@ -29,14 +29,12 @@ namespace Microsoft.Bot.Builder.Skills.Integration
         private readonly IBotTelemetryClient _botTelemetryClient;
         private readonly MicrosoftAppCredentials _serviceClientCredentials;
         private readonly SkillOptions _skillOptions;
-        private IStreamingTransportClient _streamingTransportClient;
 
-        public SkillWebSocketsConnector(SkillOptions skillOptions, MicrosoftAppCredentials serviceClientCredentials, IBotTelemetryClient botTelemetryClient, IStreamingTransportClient streamingTransportClient = null)
+        public SkillWebSocketsConnector(SkillOptions skillOptions, MicrosoftAppCredentials serviceClientCredentials, IBotTelemetryClient botTelemetryClient)
         {
             _botTelemetryClient = botTelemetryClient;
             _skillOptions = skillOptions;
             _serviceClientCredentials = serviceClientCredentials;
-            _streamingTransportClient = streamingTransportClient;
         }
 
         public override async Task<Activity> ForwardActivityAsync(ITurnContext turnContext, Activity activity, CancellationToken cancellationToken)
@@ -47,29 +45,13 @@ namespace Microsoft.Bot.Builder.Skills.Integration
         public override async Task<Activity> ForwardActivityAsync(ITurnContext turnContext, Activity activity, SendActivitiesHandler activitiesHandler, CancellationToken cancellationToken)
         {
             var responseHandler = new SkillWebSocketsResponseHandler(turnContext, activitiesHandler, _botTelemetryClient);
-            try
+            using (var streamingTransportClient = CreateWebSocketClient(responseHandler))
             {
-                if (_streamingTransportClient == null)
+                await ConnectAsync(streamingTransportClient, activity.ChannelId).ConfigureAwait(false);
+                await SendActivityAsync(streamingTransportClient, activity, cancellationToken).ConfigureAwait(false);
+                if (streamingTransportClient != null && streamingTransportClient.IsConnected)
                 {
-                    _streamingTransportClient = CreateWebSocketClient(responseHandler);
-                }
-
-                await ConnectAsync(activity.ChannelId).ConfigureAwait(false);
-                await SendActivityAsync(activity, cancellationToken).ConfigureAwait(false);
-            }
-#pragma warning disable CA1031 // Do not catch general exception types
-            catch (Exception ex)
-#pragma warning restore CA1031 // Do not catch general exception types
-            {
-                // TODO: figure out the right way of rising exceptions.
-                Console.Write(ex.ToString());
-                throw;
-            }
-            finally
-            {
-                if (_streamingTransportClient != null && _streamingTransportClient.IsConnected)
-                {
-                    _streamingTransportClient.Disconnect();
+                    streamingTransportClient.Disconnect();
                 }
             }
 
@@ -108,7 +90,7 @@ namespace Microsoft.Bot.Builder.Skills.Integration
             return url;
         }
 
-        private async Task SendActivityAsync(Activity activity, CancellationToken cancellationToken)
+        private async Task SendActivityAsync(IStreamingTransportClient streamingTransportClient, Activity activity, CancellationToken cancellationToken)
         {
             // set recipient to the skill
             var recipientId = activity.Recipient.Id;
@@ -125,7 +107,7 @@ namespace Microsoft.Bot.Builder.Skills.Integration
                 activity.Recipient.Id = recipientId;
 
                 stopWatch.Start();
-                await _streamingTransportClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
+                await streamingTransportClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
                 stopWatch.Stop();
             }
 
@@ -142,7 +124,7 @@ namespace Microsoft.Bot.Builder.Skills.Integration
                 });
         }
 
-        private async Task ConnectAsync(string channelId)
+        private async Task ConnectAsync(IStreamingTransportClient streamingTransportClient, string channelId)
         {
             // acquire AAD token
             var token = await _serviceClientCredentials.GetTokenAsync().ConfigureAwait(false);
@@ -154,7 +136,7 @@ namespace Microsoft.Bot.Builder.Skills.Integration
                 { "channelid", channelId },
             };
 
-            await _streamingTransportClient.ConnectAsync(authHeaders).ConfigureAwait(false);
+            await streamingTransportClient.ConnectAsync(authHeaders).ConfigureAwait(false);
         }
 
         private IStreamingTransportClient CreateWebSocketClient(RequestHandler responseHandler)

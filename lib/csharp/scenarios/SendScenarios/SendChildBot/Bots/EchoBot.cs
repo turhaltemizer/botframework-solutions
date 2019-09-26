@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Schema;
+using Newtonsoft.Json;
 
 namespace SendChildBot.Bots
 {
@@ -13,11 +14,17 @@ namespace SendChildBot.Bots
     {
         protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
         {
-            await turnContext.SendActivityAsync(MessageFactory.Text($"Echo1: {turnContext.Activity.Text}"), cancellationToken);
-            Thread.Sleep(2000);
-            await turnContext.SendActivityAsync(MessageFactory.Text($"Echo2: {turnContext.Activity.Text}"), cancellationToken);
-            Thread.Sleep(2000);
-            await turnContext.SendActivityAsync(MessageFactory.Text($"Echo3: {turnContext.Activity.Text}"), cancellationToken);
+            var activity = (Activity)turnContext.Activity;
+            await turnContext.SendActivityAsync(MessageFactory.Text($"Echo: {activity.Text}"), cancellationToken);
+
+            if (activity.SemanticAction != null)
+            {
+                await turnContext.SendActivityAsync(MessageFactory.Text($"Semantic Action: {activity.SemanticAction.Id}"), cancellationToken);
+                foreach (var entity in activity.SemanticAction.Entities)
+                {
+                    await turnContext.SendActivityAsync(MessageFactory.Text($"Entity: {entity.Key} {JsonConvert.SerializeObject(entity.Value)}"), cancellationToken);
+                }
+            }
 
             // Send End of conversation at the end.
             await turnContext.SendActivityAsync(new Activity(ActivityTypes.EndOfConversation), cancellationToken);
