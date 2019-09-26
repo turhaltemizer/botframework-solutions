@@ -3,52 +3,54 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.28729.10
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Bot.Builder.Solutions.Skills", "microsoft.bot.builder.solutions.skills\Microsoft.Bot.Builder.Solutions.Skills\Microsoft.Bot.Builder.Solutions.Skills.csproj", "{7697554A-4470-4397-985E-45318EE22AF0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Bot.Builder.Solutions.Skills", "libraries\Microsoft.Bot.Builder.Solutions.Skills\Microsoft.Bot.Builder.Solutions.Skills.csproj", "{7697554A-4470-4397-985E-45318EE22AF0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Bot.Builder.Solutions.Skills.Tests", "microsoft.bot.builder.solutions.skills\Microsoft.Bot.Builder.Solutions.Skills.Tests\Microsoft.Bot.Builder.Solutions.Skills.Tests.csproj", "{32E629D8-4D0A-4CE3-B6AF-7A045A8A0B2C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Bot.Builder.Solutions.Skills.Tests", "tests\Microsoft.Bot.Builder.Solutions.Skills.Tests\Microsoft.Bot.Builder.Solutions.Skills.Tests.csproj", "{32E629D8-4D0A-4CE3-B6AF-7A045A8A0B2C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Bot.Builder.Solutions", "microsoft.bot.builder.solutions\microsoft.bot.builder.solutions\Microsoft.Bot.Builder.Solutions.csproj", "{A90FCDD9-E6DE-4EAD-A06F-4E1065E412F4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Bot.Builder.Solutions", "libraries\microsoft.bot.builder.solutions\Microsoft.Bot.Builder.Solutions.csproj", "{A90FCDD9-E6DE-4EAD-A06F-4E1065E412F4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Bot.Builder.Solutions.Tests", "microsoft.bot.builder.solutions\microsoft.bot.builder.solutions.tests\Microsoft.Bot.Builder.Solutions.Tests.csproj", "{26CB92E0-7747-4652-BC52-B543D122D1C9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Bot.Builder.Solutions.Tests", "tests\microsoft.bot.builder.solutions.tests\Microsoft.Bot.Builder.Solutions.Tests.csproj", "{26CB92E0-7747-4652-BC52-B543D122D1C9}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libraries", "Libraries", "{385B75F0-44DF-4B32-8676-BC46110467B7}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{A26898D5-E8CB-4CC8-8997-59090DCF6ECD}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RootBot", "Tests\VABotTest\RootBot\RootBot.csproj", "{66C7AABC-7181-4BAA-B1CA-0C65F8EC5DA7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RootBot", "scenarios\VABotTest\RootBot\RootBot.csproj", "{66C7AABC-7181-4BAA-B1CA-0C65F8EC5DA7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RootBot.Tests", "Tests\VABotTest\RootBot.Tests\RootBot.Tests.csproj", "{D2DA0E53-7C2F-4340-8899-C81A6C7729B1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RootBot.Tests", "scenarios\VABotTest\RootBot.Tests\RootBot.Tests.csproj", "{D2DA0E53-7C2F-4340-8899-C81A6C7729B1}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChildBot", "Tests\VABotTest\ChildBot\ChildBot.csproj", "{C6869B06-3637-42BE-A2A4-CF5855BB93E3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChildBot", "scenarios\VABotTest\ChildBot\ChildBot.csproj", "{C6869B06-3637-42BE-A2A4-CF5855BB93E3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChildBot.Tests", "Tests\VABotTest\ChildBot.Tests\ChildBot.Tests.csproj", "{C5CFCEB9-26FB-4B50-9DE0-2D2F35B75B35}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChildBot.Tests", "scenarios\VABotTest\ChildBot.Tests\ChildBot.Tests.csproj", "{C5CFCEB9-26FB-4B50-9DE0-2D2F35B75B35}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Bot.Builder.Skills", "libraries\Microsoft.Bot.Builder.Skills\Microsoft.Bot.Builder.Skills.csproj", "{84771E4A-3CC2-4FF5-9465-A90E8D151D4D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01. SimpleTests", "01. SimpleTests", "{3D6F1019-D503-450B-BDA4-D17B50C2E32B}"
 	ProjectSection(SolutionItems) = preProject
-		tests\SimpleTest\Readme.txt = tests\SimpleTest\Readme.txt
+		scenarios\SimpleTest\Readme.txt = scenarios\SimpleTest\Readme.txt
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RootEchoBot", "tests\SimpleTest\RootEchoBot\RootEchoBot.csproj", "{53F3D385-0A0A-4AEB-B131-768174F40CA0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RootEchoBot", "scenarios\SimpleTest\RootEchoBot\RootEchoBot.csproj", "{53F3D385-0A0A-4AEB-B131-768174F40CA0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChildEchoBot", "tests\SimpleTest\ChildEchoBot\ChildEchoBot.csproj", "{11E6BE15-553E-4399-902B-EC78AABAA477}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChildEchoBot", "scenarios\SimpleTest\ChildEchoBot\ChildEchoBot.csproj", "{11E6BE15-553E-4399-902B-EC78AABAA477}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "04. VABotTest", "04. VABotTest", "{DC1EEE90-C0C9-4124-B599-DD500E82E8EA}"
 	ProjectSection(SolutionItems) = preProject
-		tests\VABotTest\Readme.txt = tests\VABotTest\Readme.txt
+		scenarios\VABotTest\Readme.txt = scenarios\VABotTest\Readme.txt
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "02. ChildWithDialogTest", "02. ChildWithDialogTest", "{119C0D19-143E-427A-9A13-D2A916EEDCDC}"
 	ProjectSection(SolutionItems) = preProject
-		tests\ChildWithDialogTest\Readme.txt = tests\ChildWithDialogTest\Readme.txt
+		scenarios\ChildWithDialogTest\Readme.txt = scenarios\ChildWithDialogTest\Readme.txt
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChildWithDialogBot", "tests\ChildWithDialogTest\ChildWithDialogBot\ChildWithDialogBot.csproj", "{7704A042-67F7-4DFD-934D-818392BAE282}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChildWithDialogBot", "scenarios\ChildWithDialogTest\ChildWithDialogBot\ChildWithDialogBot.csproj", "{7704A042-67F7-4DFD-934D-818392BAE282}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RootNoDialogBot", "tests\ChildWithDialogTest\RootNoDialogBot\RootNoDialogBot.csproj", "{9711A9F5-648D-4B1E-8AF4-FE7C5C8F1A2D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RootNoDialogBot", "scenarios\ChildWithDialogTest\RootNoDialogBot\RootNoDialogBot.csproj", "{9711A9F5-648D-4B1E-8AF4-FE7C5C8F1A2D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "03. ParentAndChildWithDialogTests", "03. ParentAndChildWithDialogTests", "{9D8DDB4A-20BE-4E1D-8324-5D80E0B50397}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scenarios", "Scenarios", "{18E7331C-F40F-40DF-8F43-1D31F9677122}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -174,14 +176,14 @@ Global
 		{C6869B06-3637-42BE-A2A4-CF5855BB93E3} = {DC1EEE90-C0C9-4124-B599-DD500E82E8EA}
 		{C5CFCEB9-26FB-4B50-9DE0-2D2F35B75B35} = {DC1EEE90-C0C9-4124-B599-DD500E82E8EA}
 		{84771E4A-3CC2-4FF5-9465-A90E8D151D4D} = {385B75F0-44DF-4B32-8676-BC46110467B7}
-		{3D6F1019-D503-450B-BDA4-D17B50C2E32B} = {A26898D5-E8CB-4CC8-8997-59090DCF6ECD}
+		{3D6F1019-D503-450B-BDA4-D17B50C2E32B} = {18E7331C-F40F-40DF-8F43-1D31F9677122}
 		{53F3D385-0A0A-4AEB-B131-768174F40CA0} = {3D6F1019-D503-450B-BDA4-D17B50C2E32B}
 		{11E6BE15-553E-4399-902B-EC78AABAA477} = {3D6F1019-D503-450B-BDA4-D17B50C2E32B}
-		{DC1EEE90-C0C9-4124-B599-DD500E82E8EA} = {A26898D5-E8CB-4CC8-8997-59090DCF6ECD}
-		{119C0D19-143E-427A-9A13-D2A916EEDCDC} = {A26898D5-E8CB-4CC8-8997-59090DCF6ECD}
+		{DC1EEE90-C0C9-4124-B599-DD500E82E8EA} = {18E7331C-F40F-40DF-8F43-1D31F9677122}
+		{119C0D19-143E-427A-9A13-D2A916EEDCDC} = {18E7331C-F40F-40DF-8F43-1D31F9677122}
 		{7704A042-67F7-4DFD-934D-818392BAE282} = {119C0D19-143E-427A-9A13-D2A916EEDCDC}
 		{9711A9F5-648D-4B1E-8AF4-FE7C5C8F1A2D} = {119C0D19-143E-427A-9A13-D2A916EEDCDC}
-		{9D8DDB4A-20BE-4E1D-8324-5D80E0B50397} = {A26898D5-E8CB-4CC8-8997-59090DCF6ECD}
+		{9D8DDB4A-20BE-4E1D-8324-5D80E0B50397} = {18E7331C-F40F-40DF-8F43-1D31F9677122}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9990775D-5FC4-4B23-8374-05AE6A536EC8}

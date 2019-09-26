@@ -59,10 +59,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Microsoft.Bot.Builder.Solutions.Skills\Microsoft.Bot.Builder.Solutions.Skills.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Reference Include="Microsoft.Bot.Protocol">
       <HintPath>..\Microsoft.Bot.Builder.Skills\Dependencies\Microsoft.Bot.Protocol.dll</HintPath>
     </Reference>
