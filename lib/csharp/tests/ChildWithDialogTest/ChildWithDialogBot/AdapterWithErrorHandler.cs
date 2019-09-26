@@ -4,18 +4,19 @@
 using System;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Integration.AspNet.Core;
+using Microsoft.Bot.Builder.StreamingExtensions;
 using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace ChildWithDialogBot
 {
-    public class AdapterWithErrorHandler : BotFrameworkHttpAdapter
+    public class AdapterWithErrorHandler : WebSocketEnabledHttpAdapter
     {
         private const string ErrorMsgText = "Sorry, it looks like something went wrong.";
 
         public AdapterWithErrorHandler(IConfiguration configuration, ILogger<BotFrameworkHttpAdapter> logger, ConversationState conversationState = null)
-            : base(configuration, logger)
+            : base(configuration, null, null, null)
         {
             OnTurnError = async (turnContext, exception) =>
             {

@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Integration.AspNet.Core;
-using Microsoft.Bot.Builder.StreamingExtensions;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace ChildEchoBot
@@ -19,11 +18,8 @@ namespace ChildEchoBot
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
-            // Register the websocket adapter
-            services.AddSingleton<IBotFrameworkHttpAdapter, WebSocketEnabledHttpAdapter>();
-
             // Create the Bot Framework Adapter with error handling enabled.
-            // services.AddSingleton<IBotFrameworkHttpAdapter, AdapterWithErrorHandler>();
+            services.AddSingleton<IBotFrameworkHttpAdapter, AdapterWithErrorHandler>();
 
             // Create the bot as a transient. In this case the ASP Controller is expecting an IBot.
             services.AddTransient<IBot, EchoBot>();

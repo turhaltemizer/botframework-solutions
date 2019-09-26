@@ -2,15 +2,16 @@
 // Licensed under the MIT License.
 
 using Microsoft.Bot.Builder.Integration.AspNet.Core;
+using Microsoft.Bot.Builder.StreamingExtensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace ChildEchoBot
 {
-    public class AdapterWithErrorHandler : BotFrameworkHttpAdapter
+    public class AdapterWithErrorHandler : WebSocketEnabledHttpAdapter
     {
         public AdapterWithErrorHandler(IConfiguration configuration, ILogger<BotFrameworkHttpAdapter> logger)
-            : base(configuration, logger)
+            : base(configuration, null, null, null)
         {
             OnTurnError = async (turnContext, exception) =>
             {

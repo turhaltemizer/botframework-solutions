@@ -26,14 +26,23 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Bot.Builder.Skills", "libraries\Microsoft.Bot.Builder.Skills\Microsoft.Bot.Builder.Skills.csproj", "{84771E4A-3CC2-4FF5-9465-A90E8D151D4D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01. SimpleTests", "01. SimpleTests", "{3D6F1019-D503-450B-BDA4-D17B50C2E32B}"
+	ProjectSection(SolutionItems) = preProject
+		tests\SimpleTest\Readme.txt = tests\SimpleTest\Readme.txt
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RootEchoBot", "tests\SimpleTest\RootEchoBot\RootEchoBot.csproj", "{53F3D385-0A0A-4AEB-B131-768174F40CA0}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChildEchoBot", "tests\SimpleTest\ChildEchoBot\ChildEchoBot.csproj", "{11E6BE15-553E-4399-902B-EC78AABAA477}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "04. VABotTest", "04. VABotTest", "{DC1EEE90-C0C9-4124-B599-DD500E82E8EA}"
+	ProjectSection(SolutionItems) = preProject
+		tests\VABotTest\Readme.txt = tests\VABotTest\Readme.txt
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "02. ChildWithDialogTest", "02. ChildWithDialogTest", "{119C0D19-143E-427A-9A13-D2A916EEDCDC}"
+	ProjectSection(SolutionItems) = preProject
+		tests\ChildWithDialogTest\Readme.txt = tests\ChildWithDialogTest\Readme.txt
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChildWithDialogBot", "tests\ChildWithDialogTest\ChildWithDialogBot\ChildWithDialogBot.csproj", "{7704A042-67F7-4DFD-934D-818392BAE282}"
 EndProject
