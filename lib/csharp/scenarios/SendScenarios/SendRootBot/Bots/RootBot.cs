@@ -33,7 +33,6 @@ namespace SendRootBot.Bots
                     break;
 
                 case "SendAsIsWithValues":
-
                     var activityWithValues = (Activity)turnContext.Activity;
                     var actionInfo = new SemanticAction("BookFlight");
                     activityWithValues.SemanticAction = actionInfo;
@@ -52,7 +51,7 @@ namespace SendRootBot.Bots
                     break;
 
                 default:
-                    await turnContext.SendActivityAsync(MessageFactory.Text("Didn't get that'"), cancellationToken);
+                    await turnContext.SendActivityAsync(MessageFactory.Text("Didn't get that"), cancellationToken);
                     return;
             }
 
