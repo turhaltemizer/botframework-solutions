@@ -10,7 +10,7 @@ using Microsoft.Bot.Schema;
 
 namespace SendChildBot.Bots
 {
-    public class ChildBot<T> : ActivityHandler
+    public class ChildBot<T> : IBot
         where T : Dialog
     {
         public ChildBot(ConversationState conversationState, T dialog)
@@ -23,15 +23,7 @@ namespace SendChildBot.Bots
 
         protected Dialog Dialog { get; }
 
-        public override async Task OnTurnAsync(ITurnContext turnContext, CancellationToken cancellationToken = default)
-        {
-            await base.OnTurnAsync(turnContext, cancellationToken);
-
-            // Save any state changes that might have occured during the turn.
-            await ConversationState.SaveChangesAsync(turnContext, false, cancellationToken);
-        }
-
-        protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
+        public async Task OnTurnAsync(ITurnContext turnContext, CancellationToken cancellationToken = default)
         {
             // Run the Dialog with the new message Activity.
             var result = await Dialog.InvokeAsync(turnContext, ConversationState.CreateProperty<DialogState>("DialogState"), cancellationToken);
@@ -39,8 +31,15 @@ namespace SendChildBot.Bots
             if (result.Status == DialogTurnStatus.Complete)
             {
                 // Send End of conversation at the end.
-                await turnContext.SendActivityAsync(new Activity(ActivityTypes.EndOfConversation), cancellationToken);
+                var activity = new Activity(ActivityTypes.EndOfConversation)
+                {
+                    Value = result.Result,
+                };
+                await turnContext.SendActivityAsync(activity, cancellationToken);
             }
+
+            // Save any state changes that might have occured during the turn.
+            await ConversationState.SaveChangesAsync(turnContext, false, cancellationToken);
         }
     }
 }

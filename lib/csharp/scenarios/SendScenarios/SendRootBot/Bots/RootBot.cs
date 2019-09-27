@@ -7,14 +7,15 @@ using System.Threading.Tasks;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Skills;
 using Microsoft.Bot.Schema;
+using Newtonsoft.Json;
 
 namespace SendRootBot.Bots
 {
     public class RootBot : ActivityHandler
     {
+        private readonly ConversationState _conversationState;
         private readonly IStatePropertyAccessor<Dictionary<string, object>> _convoState;
         private readonly SkillConnector _skillConnector;
-        private readonly ConversationState _conversationState;
 
         public RootBot(ConversationState conversationState, SkillConnector skillConnector)
         {
@@ -75,7 +76,16 @@ namespace SendRootBot.Bots
 
             if (ret != null && ret.Type == ActivityTypes.EndOfConversation)
             {
-                await turnContext.SendActivityAsync(MessageFactory.Text("The skill has ended"), cancellationToken);
+                // Evaluate return value.
+                if (ret.Value != null)
+                {
+                    await turnContext.SendActivityAsync(MessageFactory.Text($"The skill has ended with return value = {JsonConvert.SerializeObject(ret.Value)}"), cancellationToken);
+                }
+                else
+                {
+                    await turnContext.SendActivityAsync(MessageFactory.Text("The skill has ended"), cancellationToken);
+                }
+
                 await SendMainMenuAsync(turnContext, cancellationToken);
                 state["activeFlow"] = null;
             }
