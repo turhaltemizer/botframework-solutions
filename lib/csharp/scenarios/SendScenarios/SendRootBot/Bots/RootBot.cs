@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -38,35 +39,39 @@ namespace SendRootBot.Bots
             Activity ret;
             if (state.ContainsKey("activeFlow") && state["activeFlow"] != null)
             {
+                // We have an active flow, keep sending activities there.
                 ret = await _skillConnector.ForwardActivityAsync(turnContext, (Activity)turnContext.Activity, cancellationToken);
             }
             else
             {
+                // We don't have a flow, figure out what to invoke based on the selected scenario
                 switch (turnContext.Activity.Text)
                 {
-                    case "SendAsIs":
-                        state["activeFlow"] = "SendAsIs";
-                        ret = await _skillConnector.ForwardActivityAsync(turnContext, turnContext.Activity as Activity, cancellationToken);
-                        break;
-
                     case "Book a Flight":
                         state["activeFlow"] = "Book a Flight";
                         var bookFlightActivity = (Activity)turnContext.Activity;
-                        bookFlightActivity.SemanticAction = new SemanticAction("BookFlight")
+                        bookFlightActivity.SemanticAction = new SemanticAction("BookFlight");
+                        ret = await _skillConnector.ForwardActivityAsync(turnContext, bookFlightActivity, cancellationToken);
+                        break;
+
+                    case "Book a Flight (With Data)":
+                        state["activeFlow"] = "Book a Flight (With Data)";
+                        var bookFlightActivityWithData = (Activity)turnContext.Activity;
+                        bookFlightActivityWithData.SemanticAction = new SemanticAction("BookFlight")
                         {
                             Entities = new Dictionary<string, Entity>
                             {
                                 { "bookingInfo", new Entity() },
                             },
                         };
-                        bookFlightActivity.SemanticAction.Entities["bookingInfo"].SetAs(new BookingDetails()
+                        bookFlightActivityWithData.SemanticAction.Entities["bookingInfo"].SetAs(new BookingDetails()
                         {
                             Destination = "NY",
                             Origin = "SEA",
-                            TravelDate = "Tomorrow",
+                            TravelDate = $"{DateTime.Now.AddDays(2):yyyy-MM-dd}",
                         });
 
-                        ret = await _skillConnector.ForwardActivityAsync(turnContext, bookFlightActivity, cancellationToken);
+                        ret = await _skillConnector.ForwardActivityAsync(turnContext, bookFlightActivityWithData, cancellationToken);
                         break;
 
                     case "Get weather":
@@ -76,12 +81,18 @@ namespace SendRootBot.Bots
                         ret = await _skillConnector.ForwardActivityAsync(turnContext, getWeatherActivity, cancellationToken);
                         break;
 
+                    case "SendAsIs":
+                        state["activeFlow"] = "SendAsIs";
+                        ret = await _skillConnector.ForwardActivityAsync(turnContext, turnContext.Activity as Activity, cancellationToken);
+                        break;
+
                     default:
-                        await turnContext.SendActivityAsync(MessageFactory.Text("Didn't get that"), cancellationToken);
+                        await turnContext.SendActivityAsync(MessageFactory.Text("Didn't get that (from RootBot)"), cancellationToken);
                         return;
                 }
             }
 
+            // Check if the remote skill ended.
             if (ret != null && ret.Type == ActivityTypes.EndOfConversation)
             {
                 // Evaluate return value.
@@ -95,6 +106,8 @@ namespace SendRootBot.Bots
                 }
 
                 await SendMainMenuAsync(turnContext, cancellationToken);
+
+                // Clear active flow state
                 state["activeFlow"] = null;
             }
         }
@@ -115,6 +128,7 @@ namespace SendRootBot.Bots
             IEnumerable<string> actions = new List<string>
             {
                 "Book a Flight",
+                "Book a Flight (With Data)",
                 "Get weather",
                 "SendAsIs",
             };

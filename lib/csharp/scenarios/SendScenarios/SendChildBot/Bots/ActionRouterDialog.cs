@@ -38,24 +38,30 @@ namespace SendChildBot.Bots
                 switch (activity.SemanticAction.Id)
                 {
                     case "BookFlight":
-                        await turnContext.SendActivityAsync(MessageFactory.Text($"Semantic Action: {activity.SemanticAction.Id}"), cancellationToken);
-                        foreach (var entity in activity.SemanticAction.Entities)
+                        await turnContext.SendActivityAsync(MessageFactory.Text($"Got Semantic Action: {activity.SemanticAction.Id}"), cancellationToken);
+
+                        var bookingDetails = new BookingDetails();
+                        if (activity.SemanticAction.Entities != null && activity.SemanticAction.Entities.ContainsKey("bookingInfo"))
                         {
-                            await turnContext.SendActivityAsync(MessageFactory.Text($"Entity: {entity.Key} {JsonConvert.SerializeObject(entity.Value)}"), cancellationToken);
+                            var entity = activity.SemanticAction.Entities["bookingInfo"];
+                            bookingDetails = entity.GetAs<BookingDetails>();
+                            await turnContext.SendActivityAsync(MessageFactory.Text($"Got Entity: {entity.Type} {JsonConvert.SerializeObject(bookingDetails)}"), cancellationToken);
                         }
 
+                        // Start the booking dialog
                         var dialog = FindDialog(nameof(BookingDialog));
-                        return await innerDc.BeginDialogAsync(dialog.Id, new BookingDetails(), cancellationToken);
+                        return await innerDc.BeginDialogAsync(dialog.Id, bookingDetails, cancellationToken);
 
                     case "GetWeather":
-                        await turnContext.SendActivityAsync(MessageFactory.Text($"Semantic Action: {activity.SemanticAction.Id}"), cancellationToken);
+                        // This is not done yet, should a a couple of debug messages and end right away.
+                        await turnContext.SendActivityAsync(MessageFactory.Text($"Got Semantic Action: {activity.SemanticAction.Id}"), cancellationToken);
                         await turnContext.SendActivityAsync(MessageFactory.Text("TODO: This will handle GetWeather flow"), cancellationToken);
                         return new DialogTurnResult(DialogTurnStatus.Complete);
                 }
             }
 
             // TODO: here we would need to resolve against LUIS
-            await turnContext.SendActivityAsync(MessageFactory.Text($"Dunno what to do with what you said..."), cancellationToken);
+            await turnContext.SendActivityAsync(MessageFactory.Text($"Dunno what to do with what you said... (SkillBot)"), cancellationToken);
 
             return new DialogTurnResult(DialogTurnStatus.Complete);
         }
