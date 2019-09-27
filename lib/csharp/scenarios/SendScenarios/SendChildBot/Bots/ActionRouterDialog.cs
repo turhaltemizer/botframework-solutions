@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs;
 using Newtonsoft.Json;
+using SendChildBot.Dialogs;
 
-namespace SendChildBot.Dialogs
+namespace SendChildBot.Bots
 {
     public class ActionRouterDialog : ComponentDialog
     {
@@ -45,6 +46,11 @@ namespace SendChildBot.Dialogs
 
                         var dialog = FindDialog(nameof(BookingDialog));
                         return await innerDc.BeginDialogAsync(dialog.Id, new BookingDetails(), cancellationToken);
+
+                    case "GetWeather":
+                        await turnContext.SendActivityAsync(MessageFactory.Text($"Semantic Action: {activity.SemanticAction.Id}"), cancellationToken);
+                        await turnContext.SendActivityAsync(MessageFactory.Text("TODO: This will handle GetWeather flow"), cancellationToken);
+                        return new DialogTurnResult(DialogTurnStatus.Complete);
                 }
             }
 

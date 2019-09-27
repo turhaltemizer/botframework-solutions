@@ -10,10 +10,10 @@ using Microsoft.Bot.Schema;
 
 namespace SendChildBot.Bots
 {
-    public class ChildBot<T> : IBot
-        where T : Dialog
+    public class SkillBot<T> : IBot
+        where T : ActionRouterDialog
     {
-        public ChildBot(ConversationState conversationState, T dialog)
+        public SkillBot(ConversationState conversationState, T dialog)
         {
             ConversationState = conversationState;
             Dialog = dialog;

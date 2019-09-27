@@ -49,23 +49,31 @@ namespace SendRootBot.Bots
                         ret = await _skillConnector.ForwardActivityAsync(turnContext, turnContext.Activity as Activity, cancellationToken);
                         break;
 
-                    case "SendAsIsWithValues":
-                        state["activeFlow"] = "SendAsIsWithValues";
-                        var activityWithValues = (Activity)turnContext.Activity;
-                        var actionInfo = new SemanticAction("BookFlight");
-                        activityWithValues.SemanticAction = actionInfo;
-                        activityWithValues.SemanticAction.Entities = new Dictionary<string, Entity>
+                    case "Book a Flight":
+                        state["activeFlow"] = "Book a Flight";
+                        var bookFlightActivity = (Activity)turnContext.Activity;
+                        bookFlightActivity.SemanticAction = new SemanticAction("BookFlight")
                         {
-                            { "bookingInfo", new Entity() },
+                            Entities = new Dictionary<string, Entity>
+                            {
+                                { "bookingInfo", new Entity() },
+                            },
                         };
-                        activityWithValues.SemanticAction.Entities["bookingInfo"].SetAs(new BookingDetails()
+                        bookFlightActivity.SemanticAction.Entities["bookingInfo"].SetAs(new BookingDetails()
                         {
                             Destination = "NY",
                             Origin = "SEA",
                             TravelDate = "Tomorrow",
                         });
 
-                        ret = await _skillConnector.ForwardActivityAsync(turnContext, activityWithValues, cancellationToken);
+                        ret = await _skillConnector.ForwardActivityAsync(turnContext, bookFlightActivity, cancellationToken);
+                        break;
+
+                    case "Get weather":
+                        state["activeFlow"] = "Get weather";
+                        var getWeatherActivity = (Activity)turnContext.Activity;
+                        getWeatherActivity.SemanticAction = new SemanticAction("GetWeather");
+                        ret = await _skillConnector.ForwardActivityAsync(turnContext, getWeatherActivity, cancellationToken);
                         break;
 
                     default:
@@ -106,8 +114,9 @@ namespace SendRootBot.Bots
         {
             IEnumerable<string> actions = new List<string>
             {
+                "Book a Flight",
+                "Get weather",
                 "SendAsIs",
-                "SendAsIsWithValues",
             };
             var msg = MessageFactory.SuggestedActions(actions, "Hello and welcome to the Send Scenarios bot!");
             await turnContext.SendActivityAsync(msg, cancellationToken);
