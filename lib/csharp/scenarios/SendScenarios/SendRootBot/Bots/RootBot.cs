@@ -14,51 +14,70 @@ namespace SendRootBot.Bots
     {
         private readonly IStatePropertyAccessor<Dictionary<string, object>> _convoState;
         private readonly SkillConnector _skillConnector;
+        private readonly ConversationState _conversationState;
 
         public RootBot(ConversationState conversationState, SkillConnector skillConnector)
         {
             _skillConnector = skillConnector;
+            _conversationState = conversationState;
             _convoState = conversationState.CreateProperty<Dictionary<string, object>>("CurrentTask");
+        }
+
+        public override async Task OnTurnAsync(ITurnContext turnContext, CancellationToken cancellationToken = default)
+        {
+            await base.OnTurnAsync(turnContext, cancellationToken);
+
+            // Save any state changes that might have occured during the turn.
+            await _conversationState.SaveChangesAsync(turnContext, false, cancellationToken);
         }
 
         protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
         {
             var state = await _convoState.GetAsync(turnContext, () => new Dictionary<string, object>(), cancellationToken);
-
             Activity ret;
-            switch (turnContext.Activity.Text)
+            if (state.ContainsKey("activeFlow") && state["activeFlow"] != null)
             {
-                case "SendAsIs":
-                    ret = await _skillConnector.ForwardActivityAsync(turnContext, turnContext.Activity as Activity, cancellationToken);
-                    break;
+                ret = await _skillConnector.ForwardActivityAsync(turnContext, (Activity)turnContext.Activity, cancellationToken);
+            }
+            else
+            {
+                switch (turnContext.Activity.Text)
+                {
+                    case "SendAsIs":
+                        state["activeFlow"] = "SendAsIs";
+                        ret = await _skillConnector.ForwardActivityAsync(turnContext, turnContext.Activity as Activity, cancellationToken);
+                        break;
 
-                case "SendAsIsWithValues":
-                    var activityWithValues = (Activity)turnContext.Activity;
-                    var actionInfo = new SemanticAction("BookFlight");
-                    activityWithValues.SemanticAction = actionInfo;
-                    activityWithValues.SemanticAction.Entities = new Dictionary<string, Entity>
-                    {
-                        { "bookingInfo", new Entity() },
-                    };
-                    activityWithValues.SemanticAction.Entities["bookingInfo"].SetAs(new BookingDetails()
-                    {
-                        Destination = "NY",
-                        Origin = "SEA",
-                        TravelDate = "Tomorrow",
-                    });
+                    case "SendAsIsWithValues":
+                        state["activeFlow"] = "SendAsIsWithValues";
+                        var activityWithValues = (Activity)turnContext.Activity;
+                        var actionInfo = new SemanticAction("BookFlight");
+                        activityWithValues.SemanticAction = actionInfo;
+                        activityWithValues.SemanticAction.Entities = new Dictionary<string, Entity>
+                        {
+                            { "bookingInfo", new Entity() },
+                        };
+                        activityWithValues.SemanticAction.Entities["bookingInfo"].SetAs(new BookingDetails()
+                        {
+                            Destination = "NY",
+                            Origin = "SEA",
+                            TravelDate = "Tomorrow",
+                        });
 
-                    ret = await _skillConnector.ForwardActivityAsync(turnContext, activityWithValues, cancellationToken);
-                    break;
+                        ret = await _skillConnector.ForwardActivityAsync(turnContext, activityWithValues, cancellationToken);
+                        break;
 
-                default:
-                    await turnContext.SendActivityAsync(MessageFactory.Text("Didn't get that"), cancellationToken);
-                    return;
+                    default:
+                        await turnContext.SendActivityAsync(MessageFactory.Text("Didn't get that"), cancellationToken);
+                        return;
+                }
             }
 
             if (ret != null && ret.Type == ActivityTypes.EndOfConversation)
             {
                 await turnContext.SendActivityAsync(MessageFactory.Text("The skill has ended"), cancellationToken);
                 await SendMainMenuAsync(turnContext, cancellationToken);
+                state["activeFlow"] = null;
             }
         }
 
