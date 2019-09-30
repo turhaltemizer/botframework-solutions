@@ -6,7 +6,7 @@ using Microsoft.Bot.Builder.StreamingExtensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace ChildEchoBot
+namespace SimpleChildBot
 {
     public class AdapterWithErrorHandler : WebSocketEnabledHttpAdapter
     {

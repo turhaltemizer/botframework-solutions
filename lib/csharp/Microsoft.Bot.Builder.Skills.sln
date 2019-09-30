@@ -30,9 +30,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01. SimpleTests", "01. Simp
 		scenarios\SimpleTest\Readme.txt = scenarios\SimpleTest\Readme.txt
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RootEchoBot", "scenarios\SimpleTest\RootEchoBot\RootEchoBot.csproj", "{53F3D385-0A0A-4AEB-B131-768174F40CA0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleRootBot", "scenarios\SimpleTest\RootEchoBot\SimpleRootBot.csproj", "{53F3D385-0A0A-4AEB-B131-768174F40CA0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChildEchoBot", "scenarios\SimpleTest\ChildEchoBot\ChildEchoBot.csproj", "{11E6BE15-553E-4399-902B-EC78AABAA477}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleChildBot", "scenarios\SimpleTest\ChildEchoBot\SimpleChildBot.csproj", "{11E6BE15-553E-4399-902B-EC78AABAA477}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "99. VABotTest", "99. VABotTest", "{DC1EEE90-C0C9-4124-B599-DD500E82E8EA}"
 	ProjectSection(SolutionItems) = preProject
