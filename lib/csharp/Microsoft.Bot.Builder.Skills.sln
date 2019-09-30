@@ -68,6 +68,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RemoteChildBot", "scenarios
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RemoteRootBot", "scenarios\RemoteDialog\RemoteRootBot\RemoteRootBot.csproj", "{D1404432-11D6-4C4C-9485-EC5E3BB60709}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "05. ProactiveBot", "05. ProactiveBot", "{AAEAF6DE-14C3-4D66-B624-C88B6BB64D1F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug - NuGet Packages|Any CPU = Debug - NuGet Packages|Any CPU
@@ -237,6 +239,7 @@ Global
 		{40DFDBF9-BCD7-48E1-92FC-39E619ADFC24} = {18E7331C-F40F-40DF-8F43-1D31F9677122}
 		{47D0CAAB-C495-415A-9893-9A8F8F3933DB} = {40DFDBF9-BCD7-48E1-92FC-39E619ADFC24}
 		{D1404432-11D6-4C4C-9485-EC5E3BB60709} = {40DFDBF9-BCD7-48E1-92FC-39E619ADFC24}
+		{AAEAF6DE-14C3-4D66-B624-C88B6BB64D1F} = {18E7331C-F40F-40DF-8F43-1D31F9677122}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9990775D-5FC4-4B23-8374-05AE6A536EC8}

@@ -42,7 +42,7 @@ namespace SendRootBot
                     Endpoint = new Uri(configuration["SkillAppEndpoint"]),
                 };
                 var serviceClientCredentials = new MicrosoftAppCredentials(configuration["SkillAppId"], configuration["SkillAppPassword"]);
-                return new SkillWebSocketsConnector(skillOptions, serviceClientCredentials, new NullBotTelemetryClient());
+                return SkillConnectorFactory.Create(skillOptions, serviceClientCredentials, new NullBotTelemetryClient());
             });
 
             // Create the bot as a transient. In this case the ASP Controller is expecting an IBot.

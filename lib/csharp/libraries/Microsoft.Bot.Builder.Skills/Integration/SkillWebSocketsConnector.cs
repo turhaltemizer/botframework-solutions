@@ -24,7 +24,7 @@ namespace Microsoft.Bot.Builder.Skills.Integration
     /// Its responsibility is to forward a incoming request to the skill and handle
     /// the responses based on Skill Protocol.
     /// </remarks>
-    public class SkillWebSocketsConnector : SkillConnector
+    internal class SkillWebSocketsConnector : SkillConnector
     {
         private readonly IBotTelemetryClient _botTelemetryClient;
         private readonly MicrosoftAppCredentials _serviceClientCredentials;

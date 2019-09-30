@@ -28,4 +28,15 @@ namespace SimpleRootBot.Bots
             }
         }
     }
+
+    public static class ContextEx
+    {
+        // Draft approach to Forward hanging from context
+        // var ret = await turnContext.ForwardToSkillAsync("bookingDialog", turnContext.Activity, cancellationToken);
+        public static async Task<SkillTurnResult> ForwardToSkillAsync(this ITurnContext turnContext, string skillId, Activity activity, CancellationToken cancellationToken)
+        {
+            // TODO: how do I find the connector for the skillId?
+            return new SkillTurnResult(SkillTurnStatus.Complete, null);
+        }
+    }
 }

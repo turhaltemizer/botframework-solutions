@@ -26,7 +26,7 @@ namespace RootNoDialogBot.Bots
                 Endpoint = new Uri(configuration["SkillAppEndpoint"]),
             };
             var serviceClientCredentials = new MicrosoftAppCredentials(configuration["SkillAppId"], configuration["SkillAppPassword"]);
-            _skillConnector = new SkillWebSocketsConnector(skillOptions, serviceClientCredentials, new NullBotTelemetryClient());
+            _skillConnector = SkillConnectorFactory.Create(skillOptions, serviceClientCredentials, new NullBotTelemetryClient());
         }
 
         protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
