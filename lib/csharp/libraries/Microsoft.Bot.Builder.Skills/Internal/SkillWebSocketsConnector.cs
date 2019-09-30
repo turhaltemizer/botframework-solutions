@@ -15,7 +15,7 @@ using Microsoft.Bot.StreamingExtensions.Transport;
 using Microsoft.Bot.StreamingExtensions.Transport.WebSockets;
 using Newtonsoft.Json;
 
-namespace Microsoft.Bot.Builder.Skills.Integration
+namespace Microsoft.Bot.Builder.Skills.Internal
 {
     /// <summary>
     /// SkillWebSocketsConnector that inherits from the base SkillConnector.

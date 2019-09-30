@@ -11,7 +11,7 @@ using Microsoft.Bot.StreamingExtensions;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
-namespace Microsoft.Bot.Builder.Skills.Integration
+namespace Microsoft.Bot.Builder.Skills.Internal
 {
     /// <summary>
     /// Handles the websocket responses returned by a remote skill.

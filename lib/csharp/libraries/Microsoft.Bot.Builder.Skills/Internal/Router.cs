@@ -7,7 +7,7 @@ using System.Dynamic;
 using System.Linq;
 using Microsoft.Bot.StreamingExtensions;
 
-namespace Microsoft.Bot.Builder.Skills.Integration
+namespace Microsoft.Bot.Builder.Skills.Internal
 {
     internal class Router
     {

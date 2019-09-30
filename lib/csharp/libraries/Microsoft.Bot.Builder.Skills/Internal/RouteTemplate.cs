@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Bot.StreamingExtensions;
 
-namespace Microsoft.Bot.Builder.Skills.Integration
+namespace Microsoft.Bot.Builder.Skills.Internal
 {
     internal delegate Task<object> RouteAction(ReceiveRequest request, dynamic routeData, CancellationToken cancellationToken);
 

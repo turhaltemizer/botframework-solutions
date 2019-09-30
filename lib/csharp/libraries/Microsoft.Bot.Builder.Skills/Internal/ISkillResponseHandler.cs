@@ -6,9 +6,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Bot.Schema;
 
-namespace Microsoft.Bot.Builder.Skills
+namespace Microsoft.Bot.Builder.Skills.Internal
 {
-    public interface ISkillResponseHandler
+    internal interface ISkillResponseHandler
     {
         Task<ResourceResponse[]> OnSendActivitiesAsync(ITurnContext turnContext, List<Activity> activities, SendActivitiesHandler activitiesHandler, CancellationToken cancellationToken);
 
