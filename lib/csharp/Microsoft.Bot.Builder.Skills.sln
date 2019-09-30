@@ -59,6 +59,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SendChildBot", "scenarios\S
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SendRootBot", "scenarios\SendScenarios\SendRootBot\SendRootBot.csproj", "{D1E24530-6F52-4082-8FC8-05959ADEBA20}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "04. RemoteDialog", "04. RemoteDialog", "{40DFDBF9-BCD7-48E1-92FC-39E619ADFC24}"
+	ProjectSection(SolutionItems) = preProject
+		scenarios\RemoteDialog\Readme.txt = scenarios\RemoteDialog\Readme.txt
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RemoteChildBot", "scenarios\RemoteDialog\RemoteChildBot\RemoteChildBot.csproj", "{47D0CAAB-C495-415A-9893-9A8F8F3933DB}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RemoteRootBot", "scenarios\RemoteDialog\RemoteRootBot\RemoteRootBot.csproj", "{D1404432-11D6-4C4C-9485-EC5E3BB60709}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug - NuGet Packages|Any CPU = Debug - NuGet Packages|Any CPU
@@ -185,6 +194,22 @@ Global
 		{D1E24530-6F52-4082-8FC8-05959ADEBA20}.Documentation|Any CPU.Build.0 = Debug|Any CPU
 		{D1E24530-6F52-4082-8FC8-05959ADEBA20}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D1E24530-6F52-4082-8FC8-05959ADEBA20}.Release|Any CPU.Build.0 = Release|Any CPU
+		{47D0CAAB-C495-415A-9893-9A8F8F3933DB}.Debug - NuGet Packages|Any CPU.ActiveCfg = Debug|Any CPU
+		{47D0CAAB-C495-415A-9893-9A8F8F3933DB}.Debug - NuGet Packages|Any CPU.Build.0 = Debug|Any CPU
+		{47D0CAAB-C495-415A-9893-9A8F8F3933DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{47D0CAAB-C495-415A-9893-9A8F8F3933DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{47D0CAAB-C495-415A-9893-9A8F8F3933DB}.Documentation|Any CPU.ActiveCfg = Debug|Any CPU
+		{47D0CAAB-C495-415A-9893-9A8F8F3933DB}.Documentation|Any CPU.Build.0 = Debug|Any CPU
+		{47D0CAAB-C495-415A-9893-9A8F8F3933DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{47D0CAAB-C495-415A-9893-9A8F8F3933DB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D1404432-11D6-4C4C-9485-EC5E3BB60709}.Debug - NuGet Packages|Any CPU.ActiveCfg = Debug|Any CPU
+		{D1404432-11D6-4C4C-9485-EC5E3BB60709}.Debug - NuGet Packages|Any CPU.Build.0 = Debug|Any CPU
+		{D1404432-11D6-4C4C-9485-EC5E3BB60709}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D1404432-11D6-4C4C-9485-EC5E3BB60709}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D1404432-11D6-4C4C-9485-EC5E3BB60709}.Documentation|Any CPU.ActiveCfg = Debug|Any CPU
+		{D1404432-11D6-4C4C-9485-EC5E3BB60709}.Documentation|Any CPU.Build.0 = Debug|Any CPU
+		{D1404432-11D6-4C4C-9485-EC5E3BB60709}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D1404432-11D6-4C4C-9485-EC5E3BB60709}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -209,6 +234,9 @@ Global
 		{9D8DDB4A-20BE-4E1D-8324-5D80E0B50397} = {18E7331C-F40F-40DF-8F43-1D31F9677122}
 		{29E22CE6-2FD1-4E7E-AD7C-AD58E1B63F9D} = {9D8DDB4A-20BE-4E1D-8324-5D80E0B50397}
 		{D1E24530-6F52-4082-8FC8-05959ADEBA20} = {9D8DDB4A-20BE-4E1D-8324-5D80E0B50397}
+		{40DFDBF9-BCD7-48E1-92FC-39E619ADFC24} = {18E7331C-F40F-40DF-8F43-1D31F9677122}
+		{47D0CAAB-C495-415A-9893-9A8F8F3933DB} = {40DFDBF9-BCD7-48E1-92FC-39E619ADFC24}
+		{D1404432-11D6-4C4C-9485-EC5E3BB60709} = {40DFDBF9-BCD7-48E1-92FC-39E619ADFC24}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9990775D-5FC4-4B23-8374-05AE6A536EC8}
