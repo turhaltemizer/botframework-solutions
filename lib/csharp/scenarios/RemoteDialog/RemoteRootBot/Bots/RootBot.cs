@@ -22,13 +22,13 @@ namespace RemoteRootBot.Bots
         where T : Dialog
     {
         private readonly BotState _conversationState;
-        private readonly Dialog _dialog;
+        private readonly Dialog _mainDialog;
         private readonly ILogger _logger;
 
-        public RootBot(ConversationState conversationState, T dialog, ILogger<RootBot<T>> logger)
+        public RootBot(ConversationState conversationState, T mainDialog, ILogger<RootBot<T>> logger)
         {
             _conversationState = conversationState;
-            _dialog = dialog;
+            _mainDialog = mainDialog;
             _logger = logger;
         }
 
@@ -51,17 +51,17 @@ namespace RemoteRootBot.Bots
                     var welcomeCard = CreateAdaptiveCardAttachment();
                     var response = MessageFactory.Attachment(welcomeCard);
                     await turnContext.SendActivityAsync(response, cancellationToken);
-                    await _dialog.RunAsync(turnContext, _conversationState.CreateProperty<DialogState>("DialogState"), cancellationToken);
+                    await _mainDialog.RunAsync(turnContext, _conversationState.CreateProperty<DialogState>("DialogState"), cancellationToken);
                 }
             }
         }
 
         protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Running dialog with Message Activity.");
+            _logger.LogInformation("Running mainDialog with Message Activity.");
 
             // Run the Dialog with the new message Activity.
-            await _dialog.RunAsync(turnContext, _conversationState.CreateProperty<DialogState>("DialogState"), cancellationToken);
+            await _mainDialog.RunAsync(turnContext, _conversationState.CreateProperty<DialogState>("DialogState"), cancellationToken);
         }
 
         // Load attachment from embedded resource.

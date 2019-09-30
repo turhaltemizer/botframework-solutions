@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Builder.Skills;
 using Microsoft.Bot.Schema;
@@ -12,12 +13,12 @@ using Newtonsoft.Json;
 namespace RemoteRootBot.Dialogs
 {
     // TODO: work with Steve and see if we can make this a Dialog instead of a component dialog.
-    public class BookingDialog : ComponentDialog
+    public class RemoteDialog : ComponentDialog
     {
         private readonly SkillConnector _skillConnector;
 
-        public BookingDialog(SkillConnector skillConnector)
-            : base(nameof(BookingDialog))
+        public RemoteDialog(SkillConnector skillConnector)
+            : base(nameof(RemoteDialog))
         {
             _skillConnector = skillConnector;
         }
@@ -39,14 +40,14 @@ namespace RemoteRootBot.Dialogs
             var bookingDetails = (BookingDetails)options;
             bookFlightActivityWithData.SemanticAction.Entities["bookingInfo"].SetAs(bookingDetails);
 
+            // Send message with semantic action to the remote skill.
             return await SendToSkill(dc, bookFlightActivityWithData, cancellationToken);
         }
 
         public override async Task<DialogTurnResult> ContinueDialogAsync(DialogContext dc, CancellationToken cancellationToken = default)
         {
-            var turnContext = dc.Context;
-            var activity = turnContext.Activity;
-            return await SendToSkill(dc, activity, cancellationToken);
+            // Just forward to the remote skill
+            return await SendToSkill(dc, dc.Context.Activity, cancellationToken);
         }
 
         private async Task<DialogTurnResult> SendToSkill(DialogContext dc, Activity activity, CancellationToken cancellationToken)
@@ -58,6 +59,7 @@ namespace RemoteRootBot.Dialogs
             // Check if the remote skill ended.
             if (ret != null && ret.Type == ActivityTypes.EndOfConversation)
             {
+                // Pull booking details from the response if they are there and return the as part of the end dialog.
                 // TODO: figure out an elegant way of casting the return value.
                 var bookingDetails = JsonConvert.DeserializeObject<BookingDetails>(JsonConvert.SerializeObject(ret.Value));
                 return await EndComponentAsync(dc, bookingDetails, cancellationToken);

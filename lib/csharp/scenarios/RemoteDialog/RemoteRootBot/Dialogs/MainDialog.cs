@@ -21,7 +21,7 @@ namespace RemoteRootBot.Dialogs
         private readonly FlightBookingRecognizer _luisRecognizer;
 
         // Dependency injection uses this constructor to instantiate MainDialog
-        public MainDialog(FlightBookingRecognizer luisRecognizer, BookingDialog bookingDialog, ILogger<MainDialog> logger)
+        public MainDialog(FlightBookingRecognizer luisRecognizer, RemoteDialog bookingDialog, ILogger<MainDialog> logger)
             : base(nameof(MainDialog))
         {
             _luisRecognizer = luisRecognizer;
@@ -55,8 +55,8 @@ namespace RemoteRootBot.Dialogs
         {
             if (!_luisRecognizer.IsConfigured)
             {
-                // LUIS is not configured, we just run the BookingDialog path with an empty BookingDetailsInstance.
-                return await stepContext.BeginDialogAsync(nameof(BookingDialog), new BookingDetails(), cancellationToken);
+                // LUIS is not configured, we just run the RemoteDialog path with an empty BookingDetailsInstance.
+                return await stepContext.BeginDialogAsync(nameof(RemoteDialog), new BookingDetails(), cancellationToken);
             }
 
             // Call LUIS and gather any potential booking details. (Note the TurnContext has the response to the prompt.)
@@ -75,8 +75,8 @@ namespace RemoteRootBot.Dialogs
                         TravelDate = luisResult.TravelDate,
                     };
 
-                    // Run the BookingDialog giving it whatever details we have from the LUIS call, it will fill out the remainder.
-                    return await stepContext.BeginDialogAsync(nameof(BookingDialog), bookingDetails, cancellationToken);
+                    // Run the RemoteDialog giving it whatever details we have from the LUIS call, it will fill out the remainder.
+                    return await stepContext.BeginDialogAsync(nameof(RemoteDialog), bookingDetails, cancellationToken);
 
                 case FlightBooking.Intent.GetWeather:
                     // We haven't implemented the GetWeatherDialog so we just display a TODO message.
@@ -125,14 +125,13 @@ namespace RemoteRootBot.Dialogs
 
         private async Task<DialogTurnResult> FinalStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            // If the child dialog ("BookingDialog") was cancelled, the user failed to confirm or if the intent wasn't BookFlight
+            // If the child dialog ("RemoteDialog") was cancelled, the user failed to confirm or if the intent wasn't BookFlight
             // the Result here will be null.
             if (stepContext.Result is BookingDetails result)
             {
                 // Now we have all the booking details call the booking service.
 
                 // If the call to the booking service was successful tell the user.
-
                 var timeProperty = new TimexProperty(result.TravelDate);
                 var travelDateMsg = timeProperty.ToNaturalLanguage(DateTime.Now);
                 var messageText = $"I have you booked to {result.Destination} from {result.Origin} on {travelDateMsg}";
