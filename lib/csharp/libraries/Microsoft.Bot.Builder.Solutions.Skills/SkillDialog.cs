@@ -76,7 +76,7 @@ namespace Microsoft.Bot.Builder.Solutions.Skills
                     Name = SkillEvents.CancelAllSkillDialogsEventName,
                 };
 
-                await _skillConnector.ForwardActivityAsync(turnContext, cancelRemoteDialogEvent, cancellationToken).ConfigureAwait(false);
+                await _skillConnector.ProcessActivityAsync(turnContext, cancelRemoteDialogEvent, cancellationToken).ConfigureAwait(false);
             }
 
             await base.EndDialogAsync(turnContext, instance, reason, cancellationToken).ConfigureAwait(false);
@@ -229,12 +229,12 @@ namespace Microsoft.Bot.Builder.Solutions.Skills
         {
             try
             {
-                var response = await _skillConnector.ForwardActivityAsync(dialogContext.Context, activity, cancellationToken).ConfigureAwait(false);
+                var response = await _skillConnector.ProcessActivityAsync(dialogContext.Context, activity, cancellationToken).ConfigureAwait(false);
 
-                if (response != null && response.Type == ActivityTypes.EndOfConversation)
+                if (response.Status == SkillTurnStatus.Complete)
                 {
                     await dialogContext.Context.SendActivityAsync(new Activity(type: ActivityTypes.Trace, text: $"<--Ending the skill conversation with the {_skillManifest.Name} Skill and handing off to Parent Bot."), cancellationToken).ConfigureAwait(false);
-                    return await dialogContext.EndDialogAsync(response.SemanticAction?.Entities, cancellationToken).ConfigureAwait(false);
+                    return await dialogContext.EndDialogAsync(response.Result, cancellationToken).ConfigureAwait(false);
                 }
 
                 return new DialogTurnResult(DialogTurnStatus.Waiting);

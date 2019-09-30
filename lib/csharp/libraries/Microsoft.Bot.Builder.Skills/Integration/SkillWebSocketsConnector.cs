@@ -37,12 +37,12 @@ namespace Microsoft.Bot.Builder.Skills.Integration
             _serviceClientCredentials = serviceClientCredentials;
         }
 
-        public override async Task<Activity> ForwardActivityAsync(ITurnContext turnContext, Activity activity, CancellationToken cancellationToken)
+        public override async Task<SkillTurnResult> ProcessActivityAsync(ITurnContext turnContext, Activity activity, CancellationToken cancellationToken)
         {
-            return await ForwardActivityAsync(turnContext, activity, null, cancellationToken).ConfigureAwait(false);
+            return await ProcessActivityAsync(turnContext, activity, null, cancellationToken).ConfigureAwait(false);
         }
 
-        public override async Task<Activity> ForwardActivityAsync(ITurnContext turnContext, Activity activity, SendActivitiesHandler activitiesHandler, CancellationToken cancellationToken)
+        public override async Task<SkillTurnResult> ProcessActivityAsync(ITurnContext turnContext, Activity activity, SendActivitiesHandler activitiesHandler, CancellationToken cancellationToken)
         {
             var responseHandler = new SkillWebSocketsResponseHandler(turnContext, activitiesHandler, _botTelemetryClient);
             using (var streamingTransportClient = CreateWebSocketClient(responseHandler))
@@ -55,7 +55,18 @@ namespace Microsoft.Bot.Builder.Skills.Integration
                 }
             }
 
-            return responseHandler.GetEndOfConversationActivity();
+            // Default to waiting
+            var result = new SkillTurnResult(SkillTurnStatus.Waiting);
+
+            // TODO: Find a better way of handling eoc.
+            var eocActivity = responseHandler.GetEndOfConversationActivity();
+            if (eocActivity != null)
+            {
+                result.Status = SkillTurnStatus.Complete;
+                result.Result = eocActivity.Value;
+            }
+
+            return result;
         }
 
         private static string EnsureWebSocketUrl(string url)

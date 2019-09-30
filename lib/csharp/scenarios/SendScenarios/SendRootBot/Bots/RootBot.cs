@@ -36,11 +36,11 @@ namespace SendRootBot.Bots
         protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
         {
             var state = await _convoState.GetAsync(turnContext, () => new Dictionary<string, object>(), cancellationToken);
-            Activity ret;
+            SkillTurnResult ret;
             if (state.ContainsKey("activeFlow") && state["activeFlow"] != null)
             {
                 // We have an active flow, keep sending activities there.
-                ret = await _skillConnector.ForwardActivityAsync(turnContext, (Activity)turnContext.Activity, cancellationToken);
+                ret = await _skillConnector.ProcessActivityAsync(turnContext, (Activity)turnContext.Activity, cancellationToken);
             }
             else
             {
@@ -51,7 +51,7 @@ namespace SendRootBot.Bots
                         state["activeFlow"] = "Book a Flight";
                         var bookFlightActivity = (Activity)turnContext.Activity;
                         bookFlightActivity.SemanticAction = new SemanticAction("BookFlight");
-                        ret = await _skillConnector.ForwardActivityAsync(turnContext, bookFlightActivity, cancellationToken);
+                        ret = await _skillConnector.ProcessActivityAsync(turnContext, bookFlightActivity, cancellationToken);
                         break;
 
                     case "Book a Flight (With Data)":
@@ -71,19 +71,19 @@ namespace SendRootBot.Bots
                             TravelDate = $"{DateTime.Now.AddDays(2):yyyy-MM-dd}",
                         });
 
-                        ret = await _skillConnector.ForwardActivityAsync(turnContext, bookFlightActivityWithData, cancellationToken);
+                        ret = await _skillConnector.ProcessActivityAsync(turnContext, bookFlightActivityWithData, cancellationToken);
                         break;
 
                     case "Get weather":
                         state["activeFlow"] = "Get weather";
                         var getWeatherActivity = (Activity)turnContext.Activity;
                         getWeatherActivity.SemanticAction = new SemanticAction("GetWeather");
-                        ret = await _skillConnector.ForwardActivityAsync(turnContext, getWeatherActivity, cancellationToken);
+                        ret = await _skillConnector.ProcessActivityAsync(turnContext, getWeatherActivity, cancellationToken);
                         break;
 
                     case "SendAsIs":
                         state["activeFlow"] = "SendAsIs";
-                        ret = await _skillConnector.ForwardActivityAsync(turnContext, turnContext.Activity as Activity, cancellationToken);
+                        ret = await _skillConnector.ProcessActivityAsync(turnContext, turnContext.Activity as Activity, cancellationToken);
                         break;
 
                     default:
@@ -93,12 +93,12 @@ namespace SendRootBot.Bots
             }
 
             // Check if the remote skill ended.
-            if (ret != null && ret.Type == ActivityTypes.EndOfConversation)
+            if (ret.Status == SkillTurnStatus.Complete)
             {
                 // Evaluate return value.
-                if (ret.Value != null)
+                if (ret.Result != null)
                 {
-                    await turnContext.SendActivityAsync(MessageFactory.Text($"The skill has ended with return value = {JsonConvert.SerializeObject(ret.Value)}"), cancellationToken);
+                    await turnContext.SendActivityAsync(MessageFactory.Text($"The skill has ended with return value = {JsonConvert.SerializeObject(ret.Result)}"), cancellationToken);
                 }
                 else
                 {

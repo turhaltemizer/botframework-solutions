@@ -23,7 +23,7 @@ namespace Microsoft.Bot.Builder.Skills
         /// <param name="activity">Activity object to forward.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>Response activity of the forwarded activity to the skill.</returns>
-        public abstract Task<Activity> ForwardActivityAsync(ITurnContext turnContext, Activity activity, CancellationToken cancellationToken);
+        public abstract Task<SkillTurnResult> ProcessActivityAsync(ITurnContext turnContext, Activity activity, CancellationToken cancellationToken);
 
         /// <summary>
         /// Forward incoming request to the skill.
@@ -33,6 +33,6 @@ namespace Microsoft.Bot.Builder.Skills
         /// <param name="activitiesHandler">A handler to process incoming activities.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>Response activity of the forwarded activity to the skill.</returns>
-        public abstract Task<Activity> ForwardActivityAsync(ITurnContext turnContext, Activity activity, SendActivitiesHandler activitiesHandler, CancellationToken cancellationToken);
+        public abstract Task<SkillTurnResult> ProcessActivityAsync(ITurnContext turnContext, Activity activity, SendActivitiesHandler activitiesHandler, CancellationToken cancellationToken);
     }
 }

@@ -4,7 +4,6 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Builder.Skills;
 using Microsoft.Bot.Schema;
@@ -26,22 +25,10 @@ namespace RemoteRootBot.Dialogs
         public override async Task<DialogTurnResult> BeginDialogAsync(DialogContext dc, object options = null, CancellationToken cancellationToken = default)
         {
             var turnContext = dc.Context;
-            var bookFlightActivityWithData = turnContext.Activity;
-
-            // Set the action and the entities on the activity before sending it to the remote skill.
-            bookFlightActivityWithData.SemanticAction = new SemanticAction("BookFlight")
-            {
-                Entities = new Dictionary<string, Entity>
-                {
-                    { "bookingInfo", new Entity() },
-                },
-            };
-
-            var bookingDetails = (BookingDetails)options;
-            bookFlightActivityWithData.SemanticAction.Entities["bookingInfo"].SetAs(bookingDetails);
+            AddActionToActivity(turnContext.Activity, options);
 
             // Send message with semantic action to the remote skill.
-            return await SendToSkill(dc, bookFlightActivityWithData, cancellationToken);
+            return await SendToSkill(dc, turnContext.Activity, cancellationToken);
         }
 
         public override async Task<DialogTurnResult> ContinueDialogAsync(DialogContext dc, CancellationToken cancellationToken = default)
@@ -50,18 +37,33 @@ namespace RemoteRootBot.Dialogs
             return await SendToSkill(dc, dc.Context.Activity, cancellationToken);
         }
 
+        private static void AddActionToActivity(Activity activity, object options)
+        {
+            // Set the action and the entities on the activity before sending it to the remote skill.
+            activity.SemanticAction = new SemanticAction("BookFlight")
+            {
+                Entities = new Dictionary<string, Entity>
+                {
+                    { "bookingInfo", new Entity() },
+                },
+            };
+
+            var bookingDetails = (BookingDetails)options;
+            activity.SemanticAction.Entities["bookingInfo"].SetAs(bookingDetails);
+        }
+
         private async Task<DialogTurnResult> SendToSkill(DialogContext dc, Activity activity, CancellationToken cancellationToken)
         {
-            var ret = await _skillConnector.ForwardActivityAsync(dc.Context, activity, cancellationToken);
+            var ret = await _skillConnector.ProcessActivityAsync(dc.Context, activity, cancellationToken);
 
             var turnResult = new DialogTurnResult(DialogTurnStatus.Waiting);
 
             // Check if the remote skill ended.
-            if (ret != null && ret.Type == ActivityTypes.EndOfConversation)
+            if (ret.Status == SkillTurnStatus.Complete)
             {
                 // Pull booking details from the response if they are there and return the as part of the end dialog.
                 // TODO: figure out an elegant way of casting the return value.
-                var bookingDetails = JsonConvert.DeserializeObject<BookingDetails>(JsonConvert.SerializeObject(ret.Value));
+                var bookingDetails = JsonConvert.DeserializeObject<BookingDetails>(JsonConvert.SerializeObject(ret.Result));
                 return await EndComponentAsync(dc, bookingDetails, cancellationToken);
             }
 

@@ -31,9 +31,9 @@ namespace RootNoDialogBot.Bots
 
         protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
         {
-            // var ret = await _skillConnector.ForwardActivityAsync(turnContext, turnContext.Activity as Activity, InterceptHandler, cancellationToken);
-            var ret = await _skillConnector.ForwardActivityAsync(turnContext, turnContext.Activity as Activity, InterceptHandler, cancellationToken);
-            if (ret != null && ret.Type == ActivityTypes.EndOfConversation)
+            // var ret = await _skillConnector.ProcessActivityAsync(turnContext, turnContext.Activity as Activity, InterceptHandler, cancellationToken);
+            var ret = await _skillConnector.ProcessActivityAsync(turnContext, turnContext.Activity as Activity, InterceptHandler, cancellationToken);
+            if (ret.Status == SkillTurnStatus.Complete)
             {
                 await turnContext.SendActivityAsync(MessageFactory.Text("The skill has ended"), cancellationToken);
             }
