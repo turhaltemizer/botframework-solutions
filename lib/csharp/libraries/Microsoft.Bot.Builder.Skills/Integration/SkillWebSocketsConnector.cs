@@ -58,15 +58,6 @@ namespace Microsoft.Bot.Builder.Skills.Integration
             return responseHandler.GetEndOfConversationActivity();
         }
 
-        public override async Task CancelRemoteDialogsAsync(ITurnContext turnContext, CancellationToken cancellationToken)
-        {
-            var cancelRemoteDialogEvent = Activity.CreateEventActivity();
-            cancelRemoteDialogEvent.Type = ActivityTypes.Event;
-            cancelRemoteDialogEvent.Name = SkillEvents.CancelAllSkillDialogsEventName;
-
-            await ForwardActivityAsync(turnContext, cancelRemoteDialogEvent as Activity, cancellationToken).ConfigureAwait(false);
-        }
-
         private static string EnsureWebSocketUrl(string url)
         {
             if (string.IsNullOrWhiteSpace(url))

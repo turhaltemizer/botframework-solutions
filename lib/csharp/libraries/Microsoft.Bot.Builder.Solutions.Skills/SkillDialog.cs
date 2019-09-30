@@ -70,7 +70,13 @@ namespace Microsoft.Bot.Builder.Solutions.Skills
             {
                 // when dialog is being ended/cancelled, send an activity to skill
                 // to cancel all dialogs on the skill side
-                await _skillConnector.CancelRemoteDialogsAsync(turnContext, cancellationToken).ConfigureAwait(false);
+                var cancelRemoteDialogEvent = new Activity
+                {
+                    Type = ActivityTypes.Event,
+                    Name = SkillEvents.CancelAllSkillDialogsEventName,
+                };
+
+                await _skillConnector.ForwardActivityAsync(turnContext, cancelRemoteDialogEvent, cancellationToken).ConfigureAwait(false);
             }
 
             await base.EndDialogAsync(turnContext, instance, reason, cancellationToken).ConfigureAwait(false);

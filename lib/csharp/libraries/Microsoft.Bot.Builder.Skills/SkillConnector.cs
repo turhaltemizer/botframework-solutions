@@ -34,13 +34,5 @@ namespace Microsoft.Bot.Builder.Skills
         /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>Response activity of the forwarded activity to the skill.</returns>
         public abstract Task<Activity> ForwardActivityAsync(ITurnContext turnContext, Activity activity, SendActivitiesHandler activitiesHandler, CancellationToken cancellationToken);
-
-        /// <summary>
-        /// Cancel the remote skill dialogs on the stack.
-        /// </summary>
-        /// <param name="turnContext">The turn context instance.</param>
-        /// <param name="cancellationToken">Cancellation token.</param>
-        /// <returns>Task.</returns>
-        public abstract Task CancelRemoteDialogsAsync(ITurnContext turnContext, CancellationToken cancellationToken);
     }
 }
