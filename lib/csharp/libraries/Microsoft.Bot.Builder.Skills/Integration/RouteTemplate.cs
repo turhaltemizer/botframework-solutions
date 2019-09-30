@@ -7,7 +7,7 @@ using Microsoft.Bot.StreamingExtensions;
 
 namespace Microsoft.Bot.Builder.Skills.Integration
 {
-    public delegate Task<object> RouteAction(ReceiveRequest request, dynamic routeData, CancellationToken cancellationToken);
+    internal delegate Task<object> RouteAction(ReceiveRequest request, dynamic routeData, CancellationToken cancellationToken);
 
     internal class RouteTemplate
     {
