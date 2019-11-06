@@ -10,6 +10,7 @@ using Microsoft.Bot.Builder.Solutions.Middleware;
 using Microsoft.Bot.Builder.Solutions.Responses;
 using Microsoft.Bot.Connector.Authentication;
 using Microsoft.Bot.Schema;
+using VirtualAssistantSample.Models;
 using VirtualAssistantSample.Services;
 
 namespace VirtualAssistantSample.Adapters
@@ -42,6 +43,7 @@ namespace VirtualAssistantSample.Adapters
             Use(new SetLocaleMiddleware(settings.DefaultLocale ?? "en-us"));
             Use(new EventDebuggerMiddleware());
             Use(new FeedbackMiddleware(conversationState, telemetryClient, new FeedbackOptions()));
+            Use(new CustomCardMiddleware());
         }
     }
 }
