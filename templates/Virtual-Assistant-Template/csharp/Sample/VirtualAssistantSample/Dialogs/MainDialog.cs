@@ -219,7 +219,7 @@ namespace VirtualAssistantSample.Dialogs
                 await innerDc.Context.SendActivityAsync(_templateEngine.GenerateActivityForLocale("NewUserIntroCard", userProfile));
 
                 // Start onboarding dialog.
-                await innerDc.BeginDialogAsync(nameof(OnboardingDialog));
+                // await innerDc.BeginDialogAsync(nameof(OnboardingDialog));
             }
             else
             {
