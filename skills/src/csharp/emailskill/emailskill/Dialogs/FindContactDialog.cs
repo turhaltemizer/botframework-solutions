@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using EmailSkill.Models;
 using EmailSkill.Responses.FindContact;
+using EmailSkill.Responses.Shared;
 using EmailSkill.Services;
 using EmailSkill.Utilities;
 using Luis;
@@ -28,8 +29,6 @@ namespace EmailSkill.Dialogs
     {
         public static readonly int MaxAcceptContactsNum = 20;
 
-        private ResourceMultiLanguageGenerator _lgMultiLangEngine;
-
         public FindContactDialog(
              BotSettings settings,
              BotServices services,
@@ -44,8 +43,6 @@ namespace EmailSkill.Dialogs
             DialogStateAccessor = conversationState.CreateProperty<DialogState>(nameof(DialogState));
             ServiceManager = serviceManager;
             TelemetryClient = telemetryClient;
-
-            _lgMultiLangEngine = new ResourceMultiLanguageGenerator("FindContact.lg");
 
             // entry, get the name list
             var confirmNameList = new WaterfallStep[]
@@ -164,12 +161,12 @@ namespace EmailSkill.Dialogs
                 // ask for attendee
                 if (options.FindContactReason == FindContactDialogOptions.FindContactReasonType.FirstFindContact)
                 {
-                    var activity = await LGHelper.GenerateMessageAsync(_lgMultiLangEngine, sc.Context, "[NoRecipients]", null);
+                    var activity = await LGHelper.GenerateMessageAsync(sc.Context, EmailSharedResponses.NoRecipients, null);
                     return await sc.PromptAsync(FindContactAction.Prompt, new PromptOptions { Prompt = activity as Activity }, cancellationToken);
                 }
                 else
                 {
-                    var activity = await LGHelper.GenerateMessageAsync(_lgMultiLangEngine, sc.Context, "[AddMoreContacts]", null);
+                    var activity = await LGHelper.GenerateMessageAsync(sc.Context, FindContactResponses.AddMoreContacts, null);
                     return await sc.PromptAsync(FindContactAction.Prompt, new PromptOptions { Prompt = activity as Activity }, cancellationToken);
                 }
             }
@@ -210,7 +207,7 @@ namespace EmailSkill.Dialogs
                 {
                     if (state.FindContactInfor.ContactsNameList.Count > 1)
                     {
-                        var activity = await LGHelper.GenerateMessageAsync(_lgMultiLangEngine, sc.Context, "[BeforeSendingMessage]", new { nameList = await GetNameListStringAsync(sc) });
+                        var activity = await LGHelper.GenerateMessageAsync(sc.Context, FindContactResponses.BeforeSendingMessage, new { nameList = await GetNameListStringAsync(sc) });
                         await sc.Context.SendActivityAsync(activity);
                     }
 
@@ -327,7 +324,7 @@ namespace EmailSkill.Dialogs
             if (confirmedPerson.Emails.Count() == 1)
             {
                 // Highest probability
-                var activity = await LGHelper.GenerateMessageAsync(_lgMultiLangEngine, sc.Context, "[PromptOneNameOneAddress]", new { userName = name, emailAddress = confirmedPerson.Emails.First() ?? confirmedPerson.UserPrincipalName });
+                var activity = await LGHelper.GenerateMessageAsync(sc.Context, FindContactResponses.PromptOneNameOneAddress, new { userName = name, emailAddress = confirmedPerson.Emails.First() ?? confirmedPerson.UserPrincipalName });
                 return await sc.PromptAsync(FindContactAction.TakeFurtherAction, new PromptOptions { Prompt = activity as Activity });
             }
             else
@@ -391,7 +388,7 @@ namespace EmailSkill.Dialogs
                 // if it is confirm no, then ask user to give a new attendee
                 if (options.UpdateUserNameReason == FindContactDialogOptions.UpdateUserNameReasonType.ConfirmNo)
                 {
-                    var activity = await LGHelper.GenerateMessageAsync(_lgMultiLangEngine, sc.Context, "[NoRecipients]", null);
+                    var activity = await LGHelper.GenerateMessageAsync(sc.Context, EmailSharedResponses.NoRecipients, null);
                     return await sc.PromptAsync(FindContactAction.Prompt, new PromptOptions { Prompt = activity as Activity });
                 }
 
@@ -404,12 +401,12 @@ namespace EmailSkill.Dialogs
                     {
                         state.FindContactInfor.FirstRetryInFindContact = false;
 
-                        var activity = await LGHelper.GenerateMessageAsync(_lgMultiLangEngine, sc.Context, "[UserNotFound]", new { userName = currentRecipientName });
+                        var activity = await LGHelper.GenerateMessageAsync(sc.Context, FindContactResponses.UserNotFound, new { userName = currentRecipientName });
                         return await sc.PromptAsync(FindContactAction.Prompt, new PromptOptions { Prompt = activity as Activity });
                     }
                     else
                     {
-                        var activity = await LGHelper.GenerateMessageAsync(_lgMultiLangEngine, sc.Context, "[UserNotFoundAgain]", new { userName = currentRecipientName, source = state.MailSourceType == MailSource.Microsoft ? "Outlook" : "Gmail" });
+                        var activity = await LGHelper.GenerateMessageAsync(sc.Context, FindContactResponses.UserNotFoundAgain, new { userName = currentRecipientName, source = state.MailSourceType == MailSource.Microsoft ? "Outlook" : "Gmail" });
                         await sc.Context.SendActivityAsync(activity);
 
                         state.FindContactInfor.FirstRetryInFindContact = true;
@@ -438,7 +435,7 @@ namespace EmailSkill.Dialogs
 
                 if (string.IsNullOrEmpty(userInput) && options.UpdateUserNameReason != FindContactDialogOptions.UpdateUserNameReasonType.Initialize)
                 {
-                    var activity = await LGHelper.GenerateMessageAsync(_lgMultiLangEngine, sc.Context, "[UserNotFoundAgain]", new { userName = userInput, source = state.MailSourceType == MailSource.Microsoft ? "Outlook" : "Gmail" });
+                    var activity = await LGHelper.GenerateMessageAsync(sc.Context, FindContactResponses.UserNotFoundAgain, new { userName = userInput, source = state.MailSourceType == MailSource.Microsoft ? "Outlook" : "Gmail" });
                     await sc.Context.SendActivityAsync(activity);
                     return await sc.EndDialogAsync();
                 }
@@ -607,7 +604,7 @@ namespace EmailSkill.Dialogs
                         }
                         else
                         {
-                            var activity = await LGHelper.GenerateMessageAsync(_lgMultiLangEngine, sc.Context, "[AlreadyFirstPage]", null);
+                            var activity = await LGHelper.GenerateMessageAsync(sc.Context, FindContactResponses.AlreadyFirstPage, null);
                             await sc.Context.SendActivityAsync(activity);
                         }
                     }
@@ -691,7 +688,7 @@ namespace EmailSkill.Dialogs
                         }
                         else
                         {
-                            var activity = await LGHelper.GenerateMessageAsync(_lgMultiLangEngine, sc.Context, "[AlreadyFirstPage]", null);
+                            var activity = await LGHelper.GenerateMessageAsync(sc.Context, FindContactResponses.AlreadyFirstPage, null);
                             await sc.Context.SendActivityAsync(activity);
                         }
                     }
@@ -731,7 +728,7 @@ namespace EmailSkill.Dialogs
                 var state = await Accessor.GetAsync(sc.Context);
                 var nameString = state.FindContactInfor.Contacts.ToSpeechString(CommonStrings.And, li => $"{li.EmailAddress.Name ?? li.EmailAddress.Name}: {li.EmailAddress.Address}");
 
-                var activity = await LGHelper.GenerateMessageAsync(_lgMultiLangEngine, sc.Context, "[AddMoreContactsPrompt]", new { nameList = nameString });
+                var activity = await LGHelper.GenerateMessageAsync(sc.Context, FindContactResponses.AddMoreContactsPrompt, new { nameList = nameString });
                 return await sc.PromptAsync(FindContactAction.TakeFurtherAction, new PromptOptions { Prompt = activity as Activity }, cancellationToken);
             }
             catch (Exception ex)
@@ -900,7 +897,7 @@ namespace EmailSkill.Dialogs
             TelemetryClient.TrackException(ex, new Dictionary<string, string> { { nameof(sc.ActiveDialog), sc.ActiveDialog?.Id } });
 
             // send error message to bot user
-            var activity = await LGHelper.GenerateMessageAsync(_lgMultiLangEngine, sc.Context, "[ErrorMessage]", null);
+            var activity = await LGHelper.GenerateMessageAsync(sc.Context, EmailSharedResponses.EmailErrorMessage, null);
             await sc.Context.SendActivityAsync(activity);
 
             // clear state
@@ -954,11 +951,11 @@ namespace EmailSkill.Dialogs
                 pageIndex = state.FindContactInfor.ShowContactsIndex;
                 skip = pageSize * pageIndex;
 
-                var replyActivity = await LGHelper.GenerateMessageAsync(_lgMultiLangEngine, sc.Context, "[AlreadyLastPage]", null);
+                var replyActivity = await LGHelper.GenerateMessageAsync(sc.Context, FindContactResponses.AlreadyLastPage, null);
                 await sc.Context.SendActivityAsync(replyActivity);
             }
 
-            var reply = await LGHelper.GenerateMessageAsync(_lgMultiLangEngine, sc.Context, "[ConfirmMultiplContactEmailSinglePage]", new { userName = confirmedPerson.DisplayName });
+            var reply = await LGHelper.GenerateMessageAsync(sc.Context, FindContactResponses.ConfirmMultiplContactEmailSinglePage, new { userName = confirmedPerson.DisplayName });
             var options = new PromptOptions
             {
                 Choices = new List<Choice>(),
@@ -967,11 +964,11 @@ namespace EmailSkill.Dialogs
 
             if (!isSinglePage)
             {
-                var multiPageReply = await LGHelper.GenerateMessageAsync(_lgMultiLangEngine, sc.Context, "[ConfirmMultiplContactEmailMultiPage]", new { userName = confirmedPerson.DisplayName });
+                var multiPageReply = await LGHelper.GenerateMessageAsync(sc.Context, FindContactResponses.ConfirmMultiplContactEmailMultiPage, new { userName = confirmedPerson.DisplayName });
                 options.Prompt = multiPageReply as Activity;
             }
 
-            var didntUnderstandReply = await LGHelper.GenerateMessageAsync(_lgMultiLangEngine, sc.Context, "[DidntUnderstandMessage]", null);
+            var didntUnderstandReply = await LGHelper.GenerateMessageAsync(sc.Context, EmailSharedResponses.DidntUnderstandMessage, null);
             for (var i = 0; i < emailList.Count; i++)
             {
                 var user = confirmedPerson;
@@ -1046,11 +1043,11 @@ namespace EmailSkill.Dialogs
                 pageIndex = state.FindContactInfor.ShowContactsIndex;
                 skip = pageSize * pageIndex;
 
-                var replyActivity = await LGHelper.GenerateMessageAsync(_lgMultiLangEngine, sc.Context, "[AlreadyLastPage]", null);
+                var replyActivity = await LGHelper.GenerateMessageAsync(sc.Context, FindContactResponses.AlreadyLastPage, null);
                 await sc.Context.SendActivityAsync(replyActivity);
             }
 
-            var reply = await LGHelper.GenerateMessageAsync(_lgMultiLangEngine, sc.Context, "[ConfirmMultiplContactEmailSinglePage]", new { userName = currentRecipientName });
+            var reply = await LGHelper.GenerateMessageAsync(sc.Context, FindContactResponses.ConfirmMultiplContactEmailSinglePage, new { userName = currentRecipientName });
             var options = new PromptOptions
             {
                 Choices = new List<Choice>(),
@@ -1059,11 +1056,11 @@ namespace EmailSkill.Dialogs
 
             if (!isSinglePage)
             {
-                var multiPageReply = await LGHelper.GenerateMessageAsync(_lgMultiLangEngine, sc.Context, "[ConfirmMultiplContactEmailMultiPage]", new { userName = currentRecipientName });
+                var multiPageReply = await LGHelper.GenerateMessageAsync(sc.Context, FindContactResponses.ConfirmMultipleContactNameMultiPage, new { userName = currentRecipientName });
                 options.Prompt = multiPageReply as Activity;
             }
 
-            var didntUnderstandReply = await LGHelper.GenerateMessageAsync(_lgMultiLangEngine, sc.Context, "[DidntUnderstandMessage]", null);
+            var didntUnderstandReply = await LGHelper.GenerateMessageAsync(sc.Context, EmailSharedResponses.DidntUnderstandMessage, null);
             for (var i = 0; i < unionList.Count; i++)
             {
                 var user = unionList[i];

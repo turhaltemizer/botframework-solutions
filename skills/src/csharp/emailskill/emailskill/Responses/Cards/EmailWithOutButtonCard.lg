@@ -6,9 +6,9 @@
 
 # EmailDetailRecipientWithoutButton(emailDetails)
 - IF: {emailDetails.RecipientsCount > 5}
-    - [ConfirmCard_RecipientMoreThanFive(emailDetails)]
+    - @{ConfirmCard_RecipientMoreThanFive(emailDetails)}
 - ELSE:
-    - [ConfirmCard_RecipientLessThanFive(emailDetails)]
+    - @{ConfirmCard_RecipientLessThanFive(emailDetails)}
 
 # EmailWithOutButtonCard(emailDetails)
 -```

@@ -19,8 +19,6 @@ namespace EmailSkill.Dialogs
 {
     public class ReplyEmailDialog : EmailSkillDialogBase
     {
-        private ResourceMultiLanguageGenerator _lgMultiLangEngine;
-
         public ReplyEmailDialog(
             BotSettings settings,
             BotServices services,
@@ -31,8 +29,6 @@ namespace EmailSkill.Dialogs
             : base(nameof(ReplyEmailDialog), settings, services, conversationState, serviceManager, telemetryClient, appCredentials)
         {
             TelemetryClient = telemetryClient;
-
-            _lgMultiLangEngine = new ResourceMultiLanguageGenerator("ReplyEmail.lg");
 
             var replyEmail = new WaterfallStep[]
             {
@@ -102,19 +98,20 @@ namespace EmailSkill.Dialogs
                         { "Subject", state.Subject },
                     };
 
-                    var reply = await LGHelper.GenerateAdaptiveCardAsync(
-                       _lgMultiLangEngine,
-                       sc.Context,
-                       "[SentSuccessfully]",
-                       new { subject = state.Subject },
-                       "[EmailWithOutButtonCard(emailDetails)]",
-                       new { emailDetails = emailCard });
+                    var reply = await LGHelper.GenerateMessageAsync(
+                     sc.Context,
+                     EmailSharedResponses.SentSuccessfully,
+                     new
+                     {
+                         subject = state.Subject,
+                         emailDetails = emailCard
+                     });
 
                     await sc.Context.SendActivityAsync(reply);
                 }
                 else
                 {
-                    var activity = await LGHelper.GenerateMessageAsync(_lgMultiLangEngine, sc.Context, "[CancellingMessage]", null);
+                    var activity = await LGHelper.GenerateMessageAsync(sc.Context, EmailSharedResponses.CancellingMessage, null);
                     await sc.Context.SendActivityAsync(activity);
                 }
             }

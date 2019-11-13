@@ -19,8 +19,6 @@ namespace EmailSkill.Dialogs
 {
     public class ForwardEmailDialog : EmailSkillDialogBase
     {
-        private ResourceMultiLanguageGenerator _lgMultiLangEngine;
-
         public ForwardEmailDialog(
             BotSettings settings,
             BotServices services,
@@ -32,8 +30,6 @@ namespace EmailSkill.Dialogs
             : base(nameof(ForwardEmailDialog), settings, services, conversationState, serviceManager, telemetryClient, appCredentials)
         {
             TelemetryClient = telemetryClient;
-
-            _lgMultiLangEngine = new ResourceMultiLanguageGenerator("ForwardEmail.lg");
 
             var forwardEmail = new WaterfallStep[]
             {
@@ -107,19 +103,20 @@ namespace EmailSkill.Dialogs
                     };
                     emailCard = await ProcessRecipientPhotoUrl(sc.Context, emailCard, state.FindContactInfor.Contacts);
 
-                    var reply = await LGHelper.GenerateAdaptiveCardAsync(
-                        _lgMultiLangEngine,
+                    var reply = await LGHelper.GenerateMessageAsync(
                         sc.Context,
-                        "[SentSuccessfully]",
-                        new { subject = state.Subject },
-                        "[EmailWithOutButtonCard(emailDetails)]",
-                        new { emailDetails = emailCard });
+                        EmailSharedResponses.SentSuccessfully,
+                        new
+                        {
+                            subject = state.Subject,
+                            emailDetails = emailCard
+                        });
 
                     await sc.Context.SendActivityAsync(reply);
                 }
                 else
                 {
-                    var activity = await LGHelper.GenerateMessageAsync(_lgMultiLangEngine, sc.Context, "[CancellingMessage]", null);
+                    var activity = await LGHelper.GenerateMessageAsync(sc.Context, EmailSharedResponses.CancellingMessage, null);
                     await sc.Context.SendActivityAsync(activity);
                 }
             }

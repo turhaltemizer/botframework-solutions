@@ -6,9 +6,9 @@
 
 # EmailDetailRecipient(emailDetails)
 - IF: {emailDetails.RecipientsCount > 5}
-    - [DetailCard_RecipientMoreThanFive(emailDetails)]
+    - @{DetailCard_RecipientMoreThanFive(emailDetails)}
 - ELSE:
-    - [DetailCard_RecipientLessThanFive(emailDetails)]
+    - @{DetailCard_RecipientLessThanFive(emailDetails)}
 
 # EmailDetailCard(emailDetails)
 - ```

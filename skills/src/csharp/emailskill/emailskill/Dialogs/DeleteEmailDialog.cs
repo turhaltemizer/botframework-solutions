@@ -23,8 +23,6 @@ namespace EmailSkill.Dialogs
 {
     public class DeleteEmailDialog : EmailSkillDialogBase
     {
-        private ResourceMultiLanguageGenerator _lgMultiLangEngine;
-
         public DeleteEmailDialog(
             BotSettings settings,
             BotServices services,
@@ -35,8 +33,6 @@ namespace EmailSkill.Dialogs
             : base(nameof(DeleteEmailDialog), settings, services, conversationState, serviceManager, telemetryClient, appCredentials)
         {
             TelemetryClient = telemetryClient;
-
-            _lgMultiLangEngine = new ResourceMultiLanguageGenerator("DeleteEmail.lg");
 
             var deleteEmail = new WaterfallStep[]
             {
@@ -98,15 +94,16 @@ namespace EmailSkill.Dialogs
                     emailCard = await ProcessRecipientPhotoUrl(sc.Context, emailCard, message.ToRecipients);
 
                     var speech = SpeakHelper.ToSpeechEmailSendDetailString(message.Subject, nameListString, message.BodyPreview);
-                    var prompt = await LGHelper.GenerateAdaptiveCardAsync(
-                       _lgMultiLangEngine,
+                    var prompt = await LGHelper.GenerateMessageAsync(
                        sc.Context,
-                       "[DeleteConfirm]",
-                       new { emailInfo = speech },
-                       "[EmailDetailCard(emailDetails)]",
-                       new { emailDetails = emailCard });
+                       DeleteEmailResponses.DeleteConfirm,
+                       new
+                       {
+                           emailInfo = speech,
+                           emailDetails = emailCard
+                       });
 
-                    var retry = await LGHelper.GenerateMessageAsync(_lgMultiLangEngine, sc.Context, "[ConfirmSendFailed]", null);
+                    var retry = await LGHelper.GenerateMessageAsync(sc.Context, EmailSharedResponses.ConfirmSendFailed, null);
                     return await sc.PromptAsync(Actions.TakeFurtherAction, new PromptOptions { Prompt = prompt as Activity, RetryPrompt = retry as Activity });
                 }
 
@@ -133,12 +130,12 @@ namespace EmailSkill.Dialogs
                     var focusMessage = state.Message.FirstOrDefault();
                     await mailService.DeleteMessageAsync(focusMessage.Id);
 
-                    var activity = await LGHelper.GenerateMessageAsync(_lgMultiLangEngine, sc.Context, "[DeleteSuccessfully]", null);
+                    var activity = await LGHelper.GenerateMessageAsync(sc.Context, DeleteEmailResponses.DeleteSuccessfully, null);
                     await sc.Context.SendActivityAsync(activity);
                 }
                 else
                 {
-                    var activity = await LGHelper.GenerateMessageAsync(_lgMultiLangEngine, sc.Context, "[CancellingMessage]", null);
+                    var activity = await LGHelper.GenerateMessageAsync(sc.Context, EmailSharedResponses.CancellingMessage, null);
                     await sc.Context.SendActivityAsync(activity);
                 }
 

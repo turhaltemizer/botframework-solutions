@@ -27,14 +27,13 @@ using Microsoft.Bot.Schema;
 
 namespace EmailSkill.Dialogs
 {
-    public class MainDialog : RouterDialog
+    public class MainDialog : ActivityHandlerDialog
     {
         private BotSettings _settings;
         private BotServices _services;
         private UserState _userState;
         private ConversationState _conversationState;
         private IStatePropertyAccessor<EmailSkillState> _stateAccessor;
-        private ResourceMultiLanguageGenerator _lgMultiLangEngine;
 
         public MainDialog(
             BotSettings settings,
@@ -55,7 +54,6 @@ namespace EmailSkill.Dialogs
             _conversationState = conversationState;
             TelemetryClient = telemetryClient;
             _stateAccessor = _conversationState.CreateProperty<EmailSkillState>(nameof(EmailSkillState));
-            _lgMultiLangEngine = new ResourceMultiLanguageGenerator("MainDialog.lg");
 
             AddDialog(forwardEmailDialog ?? throw new ArgumentNullException(nameof(forwardEmailDialog)));
             AddDialog(sendEmailDialog ?? throw new ArgumentNullException(nameof(sendEmailDialog)));
@@ -66,14 +64,14 @@ namespace EmailSkill.Dialogs
             GetReadingDisplayConfig();
         }
 
-        protected override async Task OnStartAsync(DialogContext dc, CancellationToken cancellationToken = default(CancellationToken))
+        protected override async Task OnMembersAddedAsync(DialogContext dc, CancellationToken cancellationToken = default(CancellationToken))
         {
             // send a greeting if we're in local mode
-            var welcome = await LGHelper.GenerateMessageAsync(_lgMultiLangEngine, dc.Context, "[EmailWelcomeMessage]", null);
+            var welcome = await LGHelper.GenerateMessageAsync(dc.Context, EmailMainResponses.EmailWelcomeMessage, null);
             await dc.Context.SendActivityAsync(welcome);
         }
 
-        protected override async Task RouteAsync(DialogContext dc, CancellationToken cancellationToken = default(CancellationToken))
+        protected override async Task OnMessageActivityAsync(DialogContext dc, CancellationToken cancellationToken = default(CancellationToken))
         {
             var state = await _stateAccessor.GetAsync(dc.Context, () => new EmailSkillState());
 
@@ -150,7 +148,7 @@ namespace EmailSkill.Dialogs
                             }
                             else
                             {
-                                var activity = await LGHelper.GenerateMessageAsync(_lgMultiLangEngine, dc.Context, "[DidntUnderstandMessage]", null);
+                                var activity = await LGHelper.GenerateMessageAsync(dc.Context, EmailSharedResponses.DidntUnderstandMessage, null);
                                 await dc.Context.SendActivityAsync(activity);
                                 turnResult = new DialogTurnResult(DialogTurnStatus.Complete);
                             }
@@ -160,7 +158,7 @@ namespace EmailSkill.Dialogs
 
                     default:
                         {
-                            var activity = await LGHelper.GenerateMessageAsync(_lgMultiLangEngine, dc.Context, "[FeatureNotAvailable]", null);
+                            var activity = await LGHelper.GenerateMessageAsync(dc.Context, EmailMainResponses.FeatureNotAvailable, null);
                             await dc.Context.SendActivityAsync(activity);
                             turnResult = new DialogTurnResult(DialogTurnStatus.Complete);
 
@@ -170,32 +168,12 @@ namespace EmailSkill.Dialogs
 
                 if (turnResult != EndOfTurn)
                 {
-                    await CompleteAsync(dc);
+                    await OnDialogCompleteAsync(dc);
                 }
             }
         }
 
-        private async Task PopulateStateFromSkillContext(ITurnContext context)
-        {
-            // If we have a SkillContext object populated from the SkillMiddleware we can retrieve requests slot (parameter) data
-            // and make available in local state as appropriate.
-            var accessor = _userState.CreateProperty<SkillContext>(nameof(SkillContext));
-            var skillContext = await accessor.GetAsync(context, () => new SkillContext());
-            if (skillContext != null)
-            {
-                if (skillContext.ContainsKey("timezone"))
-                {
-                    var timezone = skillContext["timezone"];
-                    var state = await _stateAccessor.GetAsync(context, () => new EmailSkillState());
-                    var timezoneJson = timezone as Newtonsoft.Json.Linq.JObject;
-
-                    // we have a timezone
-                    state.UserInfo.Timezone = timezoneJson.ToObject<TimeZoneInfo>();
-                }
-            }
-        }
-
-        protected override async Task CompleteAsync(DialogContext dc, DialogTurnResult result = null, CancellationToken cancellationToken = default(CancellationToken))
+        protected override async Task OnDialogCompleteAsync(DialogContext dc, object result = null, CancellationToken cancellationToken = default(CancellationToken))
         {
             // workaround. if connect skill directly to teams, the following response does not work.
             if (dc.Context.Adapter is IRemoteUserTokenProvider remoteInvocationAdapter || Channel.GetChannelId(dc.Context) != Channels.Msteams)
@@ -210,7 +188,7 @@ namespace EmailSkill.Dialogs
             await dc.EndDialogAsync(result);
         }
 
-        protected override async Task OnEventAsync(DialogContext dc, CancellationToken cancellationToken = default(CancellationToken))
+        protected override async Task OnEventActivityAsync(DialogContext dc, CancellationToken cancellationToken = default(CancellationToken))
         {
             switch (dc.Context.Activity.Name)
             {
@@ -290,19 +268,18 @@ namespace EmailSkill.Dialogs
 
         private async Task<InterruptionAction> OnCancel(DialogContext dc)
         {
-            var activity = await LGHelper.GenerateMessageAsync(_lgMultiLangEngine, dc.Context, "[CancelMessage]", null);
+            var activity = await LGHelper.GenerateMessageAsync(dc.Context, EmailMainResponses.CancelMessage, null);
             await dc.Context.SendActivityAsync(activity);
 
-            await CompleteAsync(dc);
             await dc.CancelAllDialogsAsync();
-            return InterruptionAction.StartedDialog;
+            return InterruptionAction.End;
         }
 
         private async Task<InterruptionAction> OnHelp(DialogContext dc)
         {
-            var activity = await LGHelper.GenerateMessageAsync(_lgMultiLangEngine, dc.Context, "[HelpMessage]", null);
+            var activity = await LGHelper.GenerateMessageAsync(dc.Context, EmailMainResponses.HelpMessage, null);
             await dc.Context.SendActivityAsync(activity);
-            return InterruptionAction.MessageSentToUser;
+            return InterruptionAction.Resume;
         }
 
         private async Task<InterruptionAction> OnLogout(DialogContext dc)
@@ -327,10 +304,30 @@ namespace EmailSkill.Dialogs
                 await adapter.SignOutUserAsync(dc.Context, token.ConnectionName);
             }
 
-            var activity = await LGHelper.GenerateMessageAsync(_lgMultiLangEngine, dc.Context, "[LogOut]", null);
+            var activity = await LGHelper.GenerateMessageAsync(dc.Context, EmailMainResponses.LogOut, null);
             await dc.Context.SendActivityAsync(activity);
 
-            return InterruptionAction.StartedDialog;
+            return InterruptionAction.End;
+        }
+
+        private async Task PopulateStateFromSkillContext(ITurnContext context)
+        {
+            // If we have a SkillContext object populated from the SkillMiddleware we can retrieve requests slot (parameter) data
+            // and make available in local state as appropriate.
+            var accessor = _userState.CreateProperty<SkillContext>(nameof(SkillContext));
+            var skillContext = await accessor.GetAsync(context, () => new SkillContext());
+            if (skillContext != null)
+            {
+                if (skillContext.ContainsKey("timezone"))
+                {
+                    var timezone = skillContext["timezone"];
+                    var state = await _stateAccessor.GetAsync(context, () => new EmailSkillState());
+                    var timezoneJson = timezone as Newtonsoft.Json.Linq.JObject;
+
+                    // we have a timezone
+                    state.UserInfo.Timezone = timezoneJson.ToObject<TimeZoneInfo>();
+                }
+            }
         }
 
         private void GetReadingDisplayConfig()
