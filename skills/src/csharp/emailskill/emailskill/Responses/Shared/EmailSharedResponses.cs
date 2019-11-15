@@ -35,7 +35,6 @@ namespace EmailSkill.Responses.Shared
         public const string ConfirmSendAfterConfirmRecipients = "ConfirmSendAfterConfirmRecipients";
         public const string NoEmailContentWithRecipientConfirmed = "NoEmailContentWithRecipientConfirmed";
         public const string ShowEmailPromptWithFirstLastPrefix = "ShowEmailPromptWithFirstLastPrefix";
-        
 
         public const string EmailNotFound = "EmailNotFound";
         public const string NoFocusMessage = "NoFocusMessage";

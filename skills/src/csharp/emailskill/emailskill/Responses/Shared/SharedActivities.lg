@@ -39,14 +39,17 @@
 
 # ConfirmSendWithRecipients
 [Activity
-    Text = {ConfirmSendWithRecipientsText(emailSubject)}
-    Speak = {ConfirmSendWithRecipientsText(emailSubject)}
+    Text = {ConfirmSendWithRecipientsText()}
+    Speak = {ConfirmSendWithRecipientsSpeak(emailSubject)}
     Attachments = {json(EmailWithOutButtonCard(emailDetails))}
     InputHint = expectingInput
 ]
 
-# ConfirmSendWithRecipientsText(emailDetails)
-- @{ConfirmSend.Text(emailSubject)} @{ConfirmSendRecipientsMessage.Text()}
+# ConfirmSendWithRecipientsText
+- @{ConfirmSend.Text()} @{ConfirmSendRecipientsMessage.Text()}
+
+# ConfirmSendWithRecipientsSpeak(emailDetails)
+- @{ConfirmSend.Speak(emailDetails)} @{ConfirmSendRecipientsMessage.Text()}
 
 # ConfirmSendRecipientsFailed
 [Activity
@@ -57,14 +60,17 @@
 
 # ConfirmSendWithoutRecipients
 [Activity
-    Text = {ConfirmSendWithoutRecipientsText(emailSubject)}
-    Speak = {ConfirmSendWithoutRecipientsText(emailSubject)}
+    Text = {ConfirmSendWithoutRecipientsText()}
+    Speak = {ConfirmSendWithoutRecipientsSpeak(emailSubject)}
     Attachments = {json(EmailWithOutButtonCard(emailDetails))}
     InputHint = expectingInput
 ]
 
-# ConfirmSendWithoutRecipientsText(emailSubject)
-- @{ConfirmSend.Text(emailSubject)} @{ConfirmSendMessage.Text()}
+# ConfirmSendWithoutRecipientsText
+- @{ConfirmSend.Text()} @{ConfirmSendMessage.Text()}
+
+# ConfirmSendWithoutRecipientsSpeak(emailSubject)
+- @{ConfirmSend.Speak(emailSubject)} @{ConfirmSendMessage.Text()}
 
 # ConfirmSendAfterConfirmRecipients
 [Activity
@@ -75,6 +81,13 @@
 
 # ConfirmSendAfterConfirmRecipientsText(recipientsList)
 - @{ConfirmSendRecipients.Text(recipientsList)} @{ConfirmSendMessage.Text()}
+
+# NoEmailContent
+[Activity
+    Text = {NoEmailContent.Text()}
+    Speak = {NoEmailContent.Text()}
+    InputHint = expectingInput
+]
 
 # NoEmailContentWithRecipientConfirmed
 [Activity

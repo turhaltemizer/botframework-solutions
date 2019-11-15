@@ -20,7 +20,11 @@ using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Adapters;
 using Microsoft.Bot.Builder.AI.Luis;
 using Microsoft.Bot.Builder.Dialogs;
+using Microsoft.Bot.Builder.Dialogs.Adaptive;
+using Microsoft.Bot.Builder.Dialogs.Declarative;
 using Microsoft.Bot.Builder.Dialogs.Declarative.Resources;
+using Microsoft.Bot.Builder.Dialogs.Declarative.Types;
+using Microsoft.Bot.Builder.LanguageGeneration;
 using Microsoft.Bot.Builder.Solutions;
 using Microsoft.Bot.Builder.Solutions.Authentication;
 using Microsoft.Bot.Builder.Solutions.Proactive;
@@ -28,8 +32,10 @@ using Microsoft.Bot.Builder.Solutions.Responses;
 using Microsoft.Bot.Builder.Solutions.TaskExtensions;
 using Microsoft.Bot.Builder.Solutions.Testing;
 using Microsoft.Bot.Builder.Solutions.Util;
+using Microsoft.Bot.Connector;
 using Microsoft.Bot.Connector.Authentication;
 using Microsoft.Bot.Schema;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json.Linq;
@@ -38,7 +44,7 @@ namespace EmailSkillTest.Flow
 {
     public class EmailBotTestBase : BotTestBase
     {
-        private const string oauthConnection = "Azure Active Directory";
+        private const string Provider = "Azure Active Directory v2";
 
         public IServiceCollection Services { get; set; }
 
@@ -56,7 +62,7 @@ namespace EmailSkillTest.Flow
             {
                 OAuthConnections = new List<OAuthConnection>()
                 {
-                    new OAuthConnection() { Name = oauthConnection, Provider = oauthConnection }
+                    new OAuthConnection() { Name = Provider, Provider = Provider }
                 }
             });
 
@@ -67,7 +73,7 @@ namespace EmailSkillTest.Flow
                     {
                         "en", new CognitiveModelSet()
                         {
-                            LuisServices = new Dictionary<string, ITelemetryRecognizer>
+                            LuisServices = new Dictionary<string, LuisRecognizer>
                             {
                                 { "General", new MockGeneralLuisRecognizer() },
                                 {
@@ -97,31 +103,45 @@ namespace EmailSkillTest.Flow
                 return new BotStateSet(userState, conversationState);
             });
 
-            var path = Environment.CurrentDirectory;
-            path = Path.Combine(path + @"\..\..\..\..\emailskill\");
-            var resourceExplorer = ResourceExplorer.LoadProject(path);
+            Services.AddSingleton<TestAdapter>(sp =>
+            {
+                var adapter = new DefaultTestAdapter();
+
+                var userState = sp.GetService<UserState>();
+                var conversationState = sp.GetService<ConversationState>();
+                adapter.UseState(userState, conversationState);
+
+                var resource = sp.GetService<ResourceExplorer>();
+                adapter.UseResourceExplorer(resource);
+                adapter.UseLanguageGeneration(resource, "ResponsesAndTexts.lg");
+
+                adapter.AddUserToken("Azure Active Directory v2", Channels.Test, "user1", "test");
+
+                return adapter;
+            });
+
+            var projPath = Environment.CurrentDirectory + @"\..\..\..\..\emailskill";
+            var templateFiles = new List<string>()
+            {
+                @"DeleteEmail\DeleteEmailTexts.lg",
+                @"FindContact\FindContactTexts.lg",
+                @"Main\MainDialogTexts.lg",
+                @"SendEmail\SendEmailTexts.lg",
+                @"Shared\SharedTexts.lg",
+                @"ShowEmail\ShowEmailTexts.lg",
+            };
+            var templates = new List<string>();
+            templateFiles.ForEach(s => templates.Add(Path.Combine(projPath, "Responses", s)));
+            var engine = new TemplateEngine().AddFiles(templates);
+            Services.AddSingleton(engine);
+
+            var resourceExplorer = ResourceExplorer.LoadProject(projPath);
             Services.AddSingleton(resourceExplorer);
 
-            ResponseManager = new ResponseManager(
-                new string[] { "en", "de", "es", "fr", "it", "zh" },
-                new FindContactResponses(),
-                new DeleteEmailResponses(),
-                new ForwardEmailResponses(),
-                new EmailMainResponses(),
-                new ReplyEmailResponses(),
-                new SendEmailResponses(),
-                new EmailSharedResponses(),
-                new ShowEmailResponses());
-            Services.AddSingleton(ResponseManager);
             Services.AddSingleton<IStorage>(new MemoryStorage());
 
             Services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
             Services.AddSingleton<IServiceManager>(ServiceManager);
-            Services.AddSingleton<TestAdapter>(sp =>
-            {
-                var adapter = Services.BuildServiceProvider().GetService<BotStateSet>();
-                return new DefaultTestAdapter(adapter, oauthConnection, oauthConnection);
-            });
 
             Services.AddTransient<MainDialog>();
             Services.AddTransient<DeleteEmailDialog>();
@@ -130,10 +150,12 @@ namespace EmailSkillTest.Flow
             Services.AddTransient<ReplyEmailDialog>();
             Services.AddTransient<SendEmailDialog>();
             Services.AddTransient<ShowEmailDialog>();
-            Services.AddTransient<IBot, DialogBot<MainDialog>>();
+            Services.AddTransient<IBot, DefaultActivityHandler<MainDialog>>();
 
             ConfigData.GetInstance().MaxDisplaySize = 3;
             ConfigData.GetInstance().MaxReadSize = 3;
+
+            TypeFactory.Configuration = new ConfigurationBuilder().Build();
         }
 
         public Activity GetAuthResponse()
@@ -144,6 +166,14 @@ namespace EmailSkillTest.Flow
                 AuthenticationProvider = OAuthProvider.AzureAD
             };
             return new Activity(ActivityTypes.Event, name: "tokens/response", value: providerTokenResponse);
+        }
+
+        public string[] GetTemplates(string templateName, object data)
+        {
+            var sp = Services.BuildServiceProvider();
+            var engine = sp.GetService<TemplateEngine>();
+            var formatTemplateName = templateName + ".Text";
+            return engine.ExpandTemplate(formatTemplateName, data).ToArray();
         }
 
         public TestFlow GetTestFlow()

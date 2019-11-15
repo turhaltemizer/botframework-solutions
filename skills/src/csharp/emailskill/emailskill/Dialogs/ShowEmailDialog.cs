@@ -154,7 +154,6 @@ namespace EmailSkill.Dialogs
                 var state = await EmailStateAccessor.GetAsync(sc.Context);
                 var activity = await LGHelper.GenerateMessageAsync(sc.Context, ShowEmailResponses.ReadOut, new { messageList = state.MessageList });
                 return await sc.PromptAsync(Actions.Prompt, new PromptOptions { Prompt = activity as Activity });
-
             }
             catch (Exception ex)
             {

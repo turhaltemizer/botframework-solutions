@@ -22,8 +22,16 @@ namespace EmailSkillTest.Flow
             var testRecipient = ContextStrings.TestRecipient;
             var testEmailAddress = ContextStrings.TestEmailAdress;
 
-            var recipientDict = new StringDictionary() { { "UserName", testRecipient }, { "EmailAddress", testEmailAddress } };
-            var recipientList = new StringDictionary() { { "NameList", testRecipient + ": " + testEmailAddress } };
+            var recipientDict = new
+            {
+                UserName = testRecipient,
+                EmailAddress = testEmailAddress
+            };
+
+            var recipientList = new
+            {
+                NameList = testRecipient + ": " + testEmailAddress
+            };
 
             await GetTestFlow()
                 .Send(ForwardEmailUtterances.ForwardEmails)
@@ -51,8 +59,16 @@ namespace EmailSkillTest.Flow
             var testRecipient = ContextStrings.TestRecipient;
             var testEmailAddress = ContextStrings.TestEmailAdress;
 
-            var recipientDict = new StringDictionary() { { "UserName", testRecipient }, { "EmailAddress", testEmailAddress } };
-            var recipientList = new StringDictionary() { { "NameList", testRecipient + ": " + testEmailAddress } };
+            var recipientDict = new
+            {
+                UserName = testRecipient,
+                EmailAddress = testEmailAddress
+            };
+
+            var recipientList = new
+            {
+                NameList = testRecipient + ": " + testEmailAddress
+            };
 
             await GetTestFlow()
                 .Send(ForwardEmailUtterances.ForwardEmails)
@@ -80,8 +96,16 @@ namespace EmailSkillTest.Flow
             var testRecipient = ContextStrings.TestRecipient;
             var testEmailAddress = ContextStrings.TestEmailAdress;
 
-            var recipientDict = new StringDictionary() { { "UserName", testRecipient }, { "EmailAddress", testEmailAddress } };
-            var recipientList = new StringDictionary() { { "NameList", testRecipient + ": " + testEmailAddress } };
+            var recipientDict = new
+            {
+                UserName = testRecipient,
+                EmailAddress = testEmailAddress
+            };
+
+            var recipientList = new
+            {
+                NameList = testRecipient + ": " + testEmailAddress
+            };
 
             await GetTestFlow()
                 .Send(ForwardEmailUtterances.ForwardEmailsToRecipient)
@@ -107,8 +131,16 @@ namespace EmailSkillTest.Flow
             var testRecipient = ContextStrings.TestRecipient;
             var testEmailAddress = ContextStrings.TestEmailAdress;
 
-            var recipientDict = new StringDictionary() { { "UserName", testRecipient }, { "EmailAddress", testEmailAddress } };
-            var recipientList = new StringDictionary() { { "NameList", testRecipient + ": " + testEmailAddress } };
+            var recipientDict = new
+            {
+                UserName = testRecipient,
+                EmailAddress = testEmailAddress
+            };
+
+            var recipientList = new
+            {
+                NameList = testRecipient + ": " + testEmailAddress
+            };
 
             await GetTestFlow()
                 .Send(ForwardEmailUtterances.ForwardEmailsToRecipientWithContent)
@@ -148,19 +180,19 @@ namespace EmailSkillTest.Flow
             };
         }
 
-        private string[] ConfirmOneNameOneAddress(StringDictionary recipientDict)
+        private string[] ConfirmOneNameOneAddress(object recipientDict)
         {
-            return ParseReplies(FindContactResponses.PromptOneNameOneAddress, recipientDict);
+            return GetTemplates(FindContactResponses.PromptOneNameOneAddress, recipientDict);
         }
 
-        private string[] AddMoreContacts(StringDictionary recipientDict)
+        private string[] AddMoreContacts(object recipientDict)
         {
-            return ParseReplies(FindContactResponses.AddMoreContactsPrompt, recipientDict);
+            return GetTemplates(FindContactResponses.AddMoreContactsPrompt, recipientDict);
         }
 
         private string[] EmailNotFoundPrompt()
         {
-            return ParseReplies(EmailSharedResponses.EmailNotFound, new StringDictionary());
+            return GetTemplates(EmailSharedResponses.EmailNotFound, null);
         }
 
         private Action<IActivity> AfterSendingMessage(string subject)
@@ -169,19 +201,14 @@ namespace EmailSkillTest.Flow
             {
                 var messageActivity = activity.AsMessageActivity();
 
-                var stringToken = new StringDictionary
-                {
-                    { "Subject", subject },
-                };
-
-                var replies = ParseReplies(EmailSharedResponses.SentSuccessfully, stringToken);
+                var replies = GetTemplates(EmailSharedResponses.SentSuccessfully, new { Subject = subject });
                 CollectionAssert.Contains(replies, messageActivity.Text);
             };
         }
 
         private string[] NotSendingMessage()
         {
-            return ParseReplies(EmailSharedResponses.CancellingMessage, new StringDictionary());
+            return GetTemplates(EmailSharedResponses.CancellingMessage, null);
         }
 
         private Action<IActivity> ShowEmailList()
@@ -192,11 +219,14 @@ namespace EmailSkillTest.Flow
 
                 // Get showed mails:
                 var showedItems = ServiceManager.MailService.MyMessages;
-                var replies = ParseReplies(EmailSharedResponses.ShowEmailPrompt, new StringDictionary()
-                {
-                    { "TotalCount", showedItems.Count.ToString() },
-                    { "EmailListDetails", SpeakHelper.ToSpeechEmailListString(showedItems, TimeZoneInfo.Local, ConfigData.GetInstance().MaxReadSize) },
-                });
+
+                var replies = GetTemplates(
+                    EmailSharedResponses.ShowEmailPrompt,
+                    new
+                    {
+                        TotalCount = showedItems.Count.ToString(),
+                        EmailListDetails = SpeakHelper.ToSpeechEmailListString(showedItems, TimeZoneInfo.Local, ConfigData.GetInstance().MaxReadSize)
+                    });
 
                 CollectionAssert.Contains(replies, messageActivity.Text);
                 Assert.AreNotEqual(messageActivity.Attachments.Count, 0);
@@ -209,7 +239,7 @@ namespace EmailSkillTest.Flow
             {
                 var messageActivity = activity.AsMessageActivity();
 
-                CollectionAssert.Contains(ParseReplies(EmailSharedResponses.NoFocusMessage, new StringDictionary()), messageActivity.Text);
+                CollectionAssert.Contains(GetTemplates(EmailSharedResponses.NoFocusMessage, null), messageActivity.Text);
             };
         }
 
@@ -218,7 +248,7 @@ namespace EmailSkillTest.Flow
             return activity =>
             {
                 var messageActivity = activity.AsMessageActivity();
-                var confirmSend = ParseReplies(EmailSharedResponses.ConfirmSend, new StringDictionary());
+                var confirmSend = GetTemplates(EmailSharedResponses.ConfirmSend, null);
                 Assert.IsTrue(messageActivity.Text.StartsWith(confirmSend[0]));
                 Assert.AreEqual(messageActivity.Attachments.Count, 1);
             };
@@ -226,17 +256,17 @@ namespace EmailSkillTest.Flow
 
         private string[] CollectRecipientsMessage()
         {
-            return ParseReplies(EmailSharedResponses.NoRecipients, new StringDictionary());
+            return GetTemplates(EmailSharedResponses.NoRecipients, null);
         }
 
         private string[] CollectFocusedMessage()
         {
-            return ParseReplies(EmailSharedResponses.NoFocusMessage, new StringDictionary());
+            return GetTemplates(EmailSharedResponses.NoFocusMessage, null);
         }
 
         private string[] CollectEmailContentMessage()
         {
-            return ParseReplies(EmailSharedResponses.NoEmailContent, new StringDictionary());
+            return GetTemplates(EmailSharedResponses.NoEmailContent, null);
         }
     }
 }

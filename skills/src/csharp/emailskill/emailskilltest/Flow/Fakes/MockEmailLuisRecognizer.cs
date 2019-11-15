@@ -9,21 +9,31 @@ using Microsoft.Bot.Builder.Dialogs;
 
 namespace EmailSkillTest.Flow.Fakes
 {
-    public class MockEmailLuisRecognizer : ITelemetryRecognizer
+    public class MockEmailLuisRecognizer : LuisRecognizer
     {
+        private static LuisApplication mockApplication = new LuisApplication()
+        {
+            ApplicationId = "testappid",
+            Endpoint = "testendpoint",
+            EndpointKey = "testendpointkey"
+        };
+
         private BaseTestUtterances emailUtterancesManager;
 
         public MockEmailLuisRecognizer()
+            : base(mockApplication)
         {
             this.emailUtterancesManager = new BaseTestUtterances();
         }
 
         public MockEmailLuisRecognizer(BaseTestUtterances utterancesManager)
+            : base(mockApplication)
         {
             this.emailUtterancesManager = utterancesManager;
         }
 
         public MockEmailLuisRecognizer(params BaseTestUtterances[] utterancesManagers)
+            : base(mockApplication)
         {
             this.emailUtterancesManager = new BaseTestUtterances();
 
@@ -36,22 +46,12 @@ namespace EmailSkillTest.Flow.Fakes
             }
         }
 
-        public bool LogPersonalInformation { get; set; } = false;
-
-        public IBotTelemetryClient TelemetryClient { get; set; } = new NullBotTelemetryClient();
-
         public void AddUtteranceManager(BaseTestUtterances utterancesManager)
         {
             this.emailUtterancesManager.AddManager(utterancesManager);
         }
 
-        public Task<RecognizerResult> RecognizeAsync(ITurnContext turnContext, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<T> RecognizeAsync<T>(ITurnContext turnContext, CancellationToken cancellationToken)
-            where T : IRecognizerConvert, new()
+        public override Task<T> RecognizeAsync<T>(ITurnContext turnContext, CancellationToken cancellationToken)
         {
             var text = turnContext.Activity.Text;
             var mockEmail = emailUtterancesManager.GetValueOrDefault(text, emailUtterancesManager.GetBaseNoneIntent());
@@ -60,23 +60,6 @@ namespace EmailSkillTest.Flow.Fakes
             var mockResult = (T)test;
 
             return Task.FromResult(mockResult);
-        }
-
-        public Task<T> RecognizeAsync<T>(DialogContext dialogContext, CancellationToken cancellationToken = default(CancellationToken))
-            where T : IRecognizerConvert, new()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<RecognizerResult> RecognizeAsync(ITurnContext turnContext, Dictionary<string, string> telemetryProperties, Dictionary<string, double> telemetryMetrics, CancellationToken cancellationToken = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<T> RecognizeAsync<T>(ITurnContext turnContext, Dictionary<string, string> telemetryProperties, Dictionary<string, double> telemetryMetrics, CancellationToken cancellationToken = default(CancellationToken))
-            where T : IRecognizerConvert, new()
-        {
-            throw new NotImplementedException();
         }
     }
 }

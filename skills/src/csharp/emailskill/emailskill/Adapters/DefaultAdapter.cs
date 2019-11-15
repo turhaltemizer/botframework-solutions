@@ -33,8 +33,6 @@ namespace EmailSkill.Adapters
             {
                 CultureInfo.CurrentUICulture = new CultureInfo(context.Activity.Locale);
 
-                // var activity = await LGHelper.GenerateMessageAsync(_lgMultiLangEngine, context, "[EmailErrorMessage]", null);
-
                 var activity = await LGHelper.GenerateMessageAsync(context, EmailSharedResponses.EmailErrorMessage, null);
                 await context.SendActivityAsync(activity);
 

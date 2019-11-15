@@ -49,8 +49,11 @@
 # ConfirmSendMessage.Text
 - Can you confirm this email?
 
-# ConfirmSend.Text(emailSubject)
-- I'm ready to send the email. || I'm ready to send the email. The Email detail is: {emailSubject}.
+# ConfirmSend.Text
+- I'm ready to send the email.
+
+# ConfirmSend.Speak(emailSubject)
+- I'm ready to send the email. The Email detail is: {emailSubject}.
 
 # ConfirmSendFailed.Text
 - Please confirm before sending this email.

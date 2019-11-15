@@ -10,8 +10,8 @@
 
 # DeleteConfirm
 [Activity
-    Text = {DeleteConfirm.Text(emailInfo)}
-    Speak = {DeleteConfirm.Text(emailInfo)}
+    Text = {DeleteConfirm.Text()}
+    Speak = {DeleteConfirm.Speak(emailInfo)}
     Attachments = {json(EmailDetailCard(emailDetails))}
     InputHint = expectingInput
 ]
