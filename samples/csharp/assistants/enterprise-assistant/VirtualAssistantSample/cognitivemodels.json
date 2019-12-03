@@ -1,6 +1,6 @@
 {
   "cognitiveModels": {
-    "en": {
+    "en-us": {
       "dispatchModel": {
         "authoringkey": "",
         "appid": "",
@@ -29,7 +29,7 @@
           "subscriptionKey": "",
           "name": "",
           "id": ""
-        }        
+        }
       ]
     }
   },
