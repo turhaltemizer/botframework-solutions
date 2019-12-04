@@ -11,12 +11,13 @@ using Luis;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.AI.QnA;
 using Microsoft.Bot.Builder.Dialogs;
-using Microsoft.Bot.Builder.Skills;
 using Microsoft.Bot.Builder.Solutions;
 using Microsoft.Bot.Builder.Solutions.Dialogs;
 using Microsoft.Bot.Builder.Solutions.Extensions;
 using Microsoft.Bot.Builder.Solutions.Proactive;
 using Microsoft.Bot.Builder.Solutions.Responses;
+using Microsoft.Bot.Builder.Solutions.Skills;
+using Microsoft.Bot.Builder.Solutions.Skills.Dialogs;
 using Microsoft.Bot.Builder.Solutions.Util;
 using Microsoft.Bot.Connector.Authentication;
 using Microsoft.Bot.Schema;
@@ -34,6 +35,7 @@ namespace VirtualAssistantSample.Dialogs
         private BotServices _services;
         private BotSettings _settings;
         private OnboardingDialog _onboardingDialog;
+        private SwitchSkillDialog _switchSkillDialog;
         private QnADialog _qnaDialog;
         private LocaleTemplateEngineManager _templateEngine;
         private IStatePropertyAccessor<SkillContext> _skillContext;
@@ -68,9 +70,10 @@ namespace VirtualAssistantSample.Dialogs
 
             // Register dialogs
             _onboardingDialog = serviceProvider.GetService<OnboardingDialog>();
-            AddDialog(_onboardingDialog);
-
+            _switchSkillDialog = serviceProvider.GetService<SwitchSkillDialog>();
             _qnaDialog = serviceProvider.GetService<QnADialog>();
+            AddDialog(_onboardingDialog);
+            AddDialog(_switchSkillDialog);
             AddDialog(_qnaDialog);
 
             // Register skill dialogs
@@ -87,8 +90,7 @@ namespace VirtualAssistantSample.Dialogs
             if (innerDc.Context.Activity.Type == ActivityTypes.Message)
             {
                 // Get cognitive models for the current locale.
-                var locale = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
-                var localizedServices = _services.CognitiveModelSets[locale];
+                var localizedServices = _services.GetCognitiveModels();
 
                 // Run LUIS recognition and store result in turn state.
                 var dispatchResult = await localizedServices.DispatchService.RecognizeAsync<DispatchLuis>(innerDc.Context, cancellationToken);
@@ -112,16 +114,32 @@ namespace VirtualAssistantSample.Dialogs
         {
             var activity = dc.Context.Activity;
             var userProfile = await _userProfileState.GetAsync(dc.Context, () => new UserProfileState());
+            var dialog = dc.ActiveDialog?.Id != null ? dc.FindDialog(dc.ActiveDialog?.Id) : null;
 
             if (activity.Type == ActivityTypes.Message && !string.IsNullOrEmpty(activity.Text))
             {
                 // Check if the active dialog is a skill for conditional interruption.
-                var dialog = dc.ActiveDialog?.Id != null ? dc.FindDialog(dc.ActiveDialog?.Id) : null;
                 var isSkill = dialog is SkillDialog;
 
                 // Get Dispatch LUIS result from turn state.
                 var dispatchResult = dc.Context.TurnState.Get<DispatchLuis>(StateProperties.DispatchResult);
-                var dispatchIntent = dispatchResult.TopIntent().intent;
+                (var dispatchIntent, var dispatchScore) = dispatchResult.TopIntent();
+
+                // Check if we need to switch skills.
+                if (isSkill)
+                {
+                    if (dispatchIntent.ToString() != dialog.Id && dispatchScore > 0.9)
+                    {
+                        var identifiedSkill = SkillRouter.IsSkill(_settings.Skills, dispatchResult.TopIntent().intent.ToString());
+
+                        if (identifiedSkill != null)
+                        {
+                            var prompt = _templateEngine.GenerateActivityForLocale("SkillSwitchPrompt", new { Skill = identifiedSkill.Name });
+                            await dc.BeginDialogAsync(_switchSkillDialog.Id, new SwitchSkillDialogOptions(prompt, identifiedSkill));
+                            return InterruptionAction.Waiting;
+                        }
+                    }
+                }
 
                 if (dispatchIntent == DispatchLuis.Intent.l_General)
                 {
@@ -254,8 +272,7 @@ namespace VirtualAssistantSample.Dialogs
             if (!string.IsNullOrEmpty(activity.Text))
             {
                 // Get current cognitive models for the current locale.
-                var locale = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
-                var localizedServices = _services.CognitiveModelSets[locale];
+                CognitiveModelSet localizedServices = _services.GetCognitiveModels();
 
                 // Get dispatch result from turn state.
                 var dispatchResult = innerDc.Context.TurnState.Get<DispatchLuis>(StateProperties.DispatchResult);
@@ -275,6 +292,8 @@ namespace VirtualAssistantSample.Dialogs
                 }
                 else if (dispatchIntent == DispatchLuis.Intent.q_Chitchat)
                 {
+                    innerDc.SuppressCompletionMessage(true);
+
                     await CallQnAMaker(innerDc, localizedServices.QnAServices["Chitchat"]);
                 }
                 else if (dispatchIntent == DispatchLuis.Intent.q_HRBenefits)
@@ -498,7 +517,7 @@ namespace VirtualAssistantSample.Dialogs
         {
             public const string DispatchResult = "dispatchResult";
             public const string GeneralResult = "generalResult";
-            public const string PreviousBotResponse = "previousBotReponse";
+            public const string PreviousBotResponse = "previousBotResponse";
             public const string Location = "location";
             public const string TimeZone = "timezone";
         }
