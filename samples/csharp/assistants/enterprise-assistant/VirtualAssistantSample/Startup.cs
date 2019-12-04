@@ -118,7 +118,7 @@ namespace VirtualAssistantSample
             services.AddTransient<OnboardingDialog>();
 
             // SAMPLE: Multi-turn QnA dialog
-            var currentLocale = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+            var currentLocale = CultureInfo.CurrentUICulture.Name.ToLower();
             services.AddTransient(s => new QnADialog(botservices.CognitiveModelSets[currentLocale].QnAServices["HRBenefits"]));
 
             // SAMPLE: Proactive notifications
